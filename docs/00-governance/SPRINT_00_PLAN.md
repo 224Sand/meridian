@@ -14,15 +14,15 @@ exists.
 | ID | Story | Role | Pts | DoR | Status |
 |---|---|---|---|---|---|
 | **S0-01** | As the delivery team, we need governance so every task has an owner and a gate | TPM | 3 | ✅ | ✅ Done |
-| **S0-02** | As the PO, I need business requirements captured so scope is unambiguous | BA | 5 | ✅ | ⬜ |
-| **S0-03** | As the PO, I need a product definition so we build the right thing | PM | 5 | ✅ | ⬜ |
-| **S0-04** | As the team, we need an architecture baseline so implementation has a target | Architect | 8 | ✅ | ⬜ |
-| **S0-05** | As the team, we need decisions recorded immutably so reversals are visible | Architect | 3 | ✅ | ⬜ |
-| **S0-06** | As the PO, I need the product name to be changeable without a refactor (FR-001) | Architect | 2 | ✅ | ⬜ |
-| **S0-07** | As QA, I need a test strategy so Definition of Done is enforceable | QA Lead | 3 | ✅ | ⬜ |
-| **S0-08** | As Security, I need a threat model so abuse controls are designed, not bolted on | Security | 3 | ✅ | ⬜ |
-| **S0-09** | As the team, we need a repo with green CI so quality gates exist from commit one | DevOps | 5 | ✅ | ⬜ |
-| **S0-10** | As the PO, I need every requirement traced to a story and a test | BA | 3 | ✅ | ⬜ |
+| **S0-02** | As the PO, I need business requirements captured so scope is unambiguous | BA | 5 | ✅ | ✅ Done |
+| **S0-03** | As the PO, I need a product definition so we build the right thing | PM | 5 | ✅ | ✅ Done |
+| **S0-04** | As the team, we need an architecture baseline so implementation has a target | Architect | 8 | ✅ | ✅ Done |
+| **S0-05** | As the team, we need decisions recorded immutably so reversals are visible | Architect | 3 | ✅ | ✅ Done |
+| **S0-06** | As the PO, I need the product name to be changeable without a refactor (FR-001) | Architect | 2 | ✅ | ✅ Done |
+| **S0-07** | As QA, I need a test strategy so Definition of Done is enforceable | QA Lead | 3 | ✅ | ✅ Done |
+| **S0-08** | As Security, I need a threat model so abuse controls are designed, not bolted on | Security | 3 | ✅ | ✅ Done |
+| **S0-09** | As the team, we need a repo with green CI so quality gates exist from commit one | DevOps | 5 | ✅ | ✅ Done |
+| **S0-10** | As the PO, I need every requirement traced to a story and a test | BA | 3 | ✅ | ✅ Done |
 
 **Committed:** 40 points.
 
