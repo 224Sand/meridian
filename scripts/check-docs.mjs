@@ -70,7 +70,7 @@ for (const raw of trace.split("\n")) {
 }
 
 for (const id of declared) {
-  if (!covered.has(id)) errors.push(`requirement ${id} is declared in the charter but not traced`);
+  if (!covered.has(id)) errors.push(`requirement ${id} is declared (charter/BRD/PRD) but not traced`);
 }
 for (const id of covered) {
   if (!declared.has(id)) warnings.push(`${id} is traced but never declared in the charter`);

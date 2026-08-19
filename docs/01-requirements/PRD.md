@@ -55,6 +55,18 @@ asked most urgently and answered worst.
 | **FR-008** | Session memory | The agent recalls earlier turns and prior incidents in the session; memory contents are visible to the user | Should |
 | **FR-009** | Postmortem drafting | Agent drafts an RCA document from the run, grounded and cited | Could |
 
+### 4.1b Change Risk Review — the second workload
+
+Added at the Sprint 1 review (Product Owner). It exists to prove the central
+claim: the control plane is workload-agnostic. Change review runs the *same*
+orchestration graph as triage — classify, retrieve, assess evidence, hypothesise,
+verify citations, propose, risk-gate — with a different task profile. A second
+graph would have been easier and would have proven nothing.
+
+| ID | Feature | Description | Priority |
+|---|---|---|---|
+| **FR-025** | Change risk review workload | Agent assesses a proposed production change against policy and incident history, cites the policy clause and the precedent, and gates on approval by risk level | Should |
+
 ### 4.2 Reliability surfaces — the control plane made visible
 
 | ID | Feature | Description | Priority |
@@ -125,11 +137,12 @@ asked most urgently and answered worst.
 
 | Release | Contents | Gate |
 |---|---|---|
-| **0.1.0** Foundation | Schema, seeded estate, telemetry generator | Sprint Review |
-| **0.2.0** Agent Core | Router, cache, RAG, orchestrator, governance, spend, evals | Sprint Review |
-| **0.3.0** Console | BFF, streaming triage, trace viewer, approval, memory | UAT |
-| **0.4.0** Experience | Narrative surface, motion system | Design Review + UAT |
-| **0.5.0** Proof | Delivery, reliability and architecture surfaces | UAT |
+| **0.1.0** Foundation | Schema, seeded estate, telemetry, corpus, retrieval | Sprint Review ✅ |
+| **0.2.0** Agent Core I | Router, providers, semantic cache, hybrid retrieval, refusal | Sprint Review |
+| **0.3.0** Agent Core II | Workloads, orchestrator, governance, approval, spend, evals | Sprint Review |
+| **0.4.0** Console | BFF, streaming triage, trace viewer, approval, memory | UAT |
+| **0.5.0** Experience | Narrative surface, motion system | Design Review + UAT |
+| **0.6.0** Proof | Delivery, reliability and architecture surfaces | UAT |
 | **1.0.0** Release | Hardened, load-tested, deployed | Release Approval |
 
 If effort runs short, releases ship **in order and complete**. A half-finished

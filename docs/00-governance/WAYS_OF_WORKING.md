@@ -117,13 +117,20 @@ optimism. Burndown is derived from real commit timestamps.
 
 | Sprint | Name | Goal | Exit gate |
 |---|---|---|---|
-| **0** | Inception | Requirements, charter, PRD, BRD, tech spec, ADRs, repo, green CI | **Requirements Sign-off** (PO) |
-| **1** | Foundation | Data layer, schema, seeded production estate, telemetry generator | Sprint Review |
-| **2** | Agent Core | Router, semantic cache, RAG, orchestrator, governance gate, spend guard, evals | Sprint Review |
-| **3** | Console | BFF, SSE streaming, trace viewer, approval gate, session memory | **UAT** |
-| **4** | Experience | The `/` Apple-grade surface, motion system, video pipeline | Design Review + UAT |
-| **5** | Proof Surfaces | `/delivery`, `/reliability`, `/architecture` | UAT |
-| **6** | Hardening & Release | Load test, e2e, threat model, runbook, observability, deploy | **Release Approval** (Exec Sponsor) |
+| **0** | Inception | Requirements, charter, PRD, BRD, tech spec, ADRs, repo, green CI | **Requirements Sign-off** ✅ |
+| **1** | Foundation | Data layer, seeded production estate, telemetry, corpus, retrieval | Sprint Review ✅ |
+| **2** | Agent Core I | Deterministic router, providers, semantic cache, hybrid retrieval, refusal gate | Sprint Review |
+| **3** | Agent Core II | Workload abstraction, orchestrator, governance, approval, spend guard, evals | Sprint Review |
+| **4** | Console | BFF, SSE streaming, trace viewer, approval UI, session memory | **UAT** |
+| **5** | Experience | The `/` Apple-grade surface, motion system, video pipeline | Design Review + UAT |
+| **6** | Proof Surfaces | `/delivery`, `/reliability`, `/architecture` | UAT |
+| **7** | Hardening & Release | Load test, e2e, threat model review, runbook, observability, deploy | **Release Approval** |
+
+**Re-planned 2026-08-20.** The Product Owner added a second workload (change
+risk review) and corpus depth at the Sprint 1 review. Sprint 2 as originally
+scoped came to 62 points against a demonstrated velocity of 41. Splitting the
+agent core across two sprints is the honest response; carrying 62 points and
+reporting a miss would not be.
 
 ---
 

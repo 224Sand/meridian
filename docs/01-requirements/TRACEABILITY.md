@@ -71,7 +71,8 @@ delivery surface (AC-002).
 | FR-021 | Requirements traceability rendered publicly | S5-DELIV | `test_traceability_view_matches_matrix_file` | 5 | Planned |
 | FR-022 | Sprint and velocity record from real commit history | S5-DELIV | `test_velocity_derived_from_commit_timestamps` | 5 | Planned |
 | FR-023 | Decision records rendered with context and consequences | S5-DELIV | `test_all_adrs_render` | 5 | Planned |
-| FR-024 | Postmortems for real defects hit during the build | S5-DELIV | `test_postmortems_render` | 5 | Planned |
+| FR-024 | Postmortems for real defects hit during the build | S6-DELIV | `test_postmortems_render` | 6 | Planned |
+| FR-025 | Change risk review workload on the same orchestration graph | S3-WORKLOAD | `test_both_workloads_share_one_graph` | 3 | Planned |
 
 ---
 
