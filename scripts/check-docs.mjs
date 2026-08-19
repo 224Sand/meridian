@@ -39,9 +39,18 @@ for (const [rel, minBytes] of REQUIRED) {
 const REQ_ID = /\b([A-Z]{2,4}-\d{3})\b/g;
 const read = (rel) => (existsSync(resolve(root, rel)) ? readFileSync(resolve(root, rel), "utf8") : "");
 
-// 1. Requirements the charter declares.
-const charter = read("docs/00-governance/WAYS_OF_WORKING.md");
-const declared = new Set((charter.match(REQ_ID) ?? []));
+// 1. Requirements are DECLARED in the charter, the BRD and the PRD. Other
+//    documents reference requirements but do not create them; treating a
+//    reference as a declaration would force TECH_SPEC prose to be traced.
+const DECLARING_DOCS = [
+  "docs/00-governance/WAYS_OF_WORKING.md",
+  "docs/01-requirements/BRD.md",
+  "docs/01-requirements/PRD.md",
+];
+const declared = new Set();
+for (const rel of DECLARING_DOCS) {
+  for (const id of read(rel).match(REQ_ID) ?? []) declared.add(id);
+}
 
 // 2. Requirements the traceability matrix covers, with story + test populated.
 const trace = read("docs/01-requirements/TRACEABILITY.md");

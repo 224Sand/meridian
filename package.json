@@ -2,8 +2,9 @@
   "name": "meridian-monorepo",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=20.9.0" },
-  "workspaces": ["apps/web", "packages/*"],
+  "engines": {
+    "node": ">=20.9.0"
+  },
   "scripts": {
     "check:config": "node scripts/check-config.mjs",
     "check:docs": "node scripts/check-docs.mjs",
