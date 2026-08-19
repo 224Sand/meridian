@@ -1,0 +1,14 @@
+{
+  "name": "meridian-monorepo",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=20.9.0" },
+  "workspaces": ["apps/web", "packages/*"],
+  "scripts": {
+    "check:config": "node scripts/check-config.mjs",
+    "check:docs": "node scripts/check-docs.mjs",
+    "check:secrets": "node scripts/check-secrets.mjs",
+    "check": "npm run check:config && npm run check:docs && npm run check:secrets",
+    "rename": "node scripts/rename.mjs"
+  }
+}

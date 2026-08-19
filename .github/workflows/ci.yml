@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "sprint/**", "feat/**", "fix/**"]
+  pull_request:
+    branches: [main]
+
+# A red pipeline blocks merge. There is no override (charter §8).
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  governance:
+    name: Governance gates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Validate product configuration (FR-001)
+        run: node scripts/check-config.mjs
+      - name: Validate PDLC artifacts and traceability (AC-002)
+        run: node scripts/check-docs.mjs
+      - name: Secret scan (Definition of Done #4)
+        run: node scripts/check-secrets.mjs

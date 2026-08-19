@@ -1,0 +1,44 @@
+# dependencies
+node_modules/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# builds
+.next/
+out/
+dist/
+build/
+*.tsbuildinfo
+
+# env & secrets  (NEVER commit)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.vercel/
+
+# media working files (source-of-truth assets are tracked; intermediates are not)
+assets/_work/
+*.mov
+*.mkv
+
+# os / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# local state
+*.sqlite
+*.sqlite3
+*.db
+coverage/
+.coverage
+htmlcov/
