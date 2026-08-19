@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [main]
 
-# A red pipeline blocks merge. There is no override (charter §8).
+# A red pipeline blocks merge. There is no override (charter section 8).
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
@@ -24,5 +24,62 @@ jobs:
         run: node scripts/check-config.mjs
       - name: Validate PDLC artifacts and traceability (AC-002)
         run: node scripts/check-docs.mjs
-      - name: Secret scan (Definition of Done #4)
+      - name: Secret scan (Definition of Done item 4)
         run: node scripts/check-secrets.mjs
+
+  agent:
+    name: Agent runtime
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/agent
+
+    # Integration tests run against a real Postgres with pgvector. This is what
+    # keeps the schema verified on every push without anyone owning a managed
+    # database (IMP-04).
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: meridian
+          POSTGRES_PASSWORD: meridian
+          POSTGRES_DB: meridian_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U meridian"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Lint
+        run: ruff check .
+
+      - name: Format check
+        run: ruff format --check .
+
+      - name: Type check
+        run: mypy meridian_agent
+
+      - name: Offline test suite
+        # Must pass with no DATABASE_URL at all: the offline suite is what runs
+        # on a contributor machine with no credentials.
+        run: pytest -q -m "not integration"
+
+      - name: Integration test suite
+        env:
+          DATABASE_URL: postgresql://meridian:meridian@localhost:5432/meridian_test
+        run: pytest -q -m integration

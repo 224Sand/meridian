@@ -14,7 +14,7 @@ against a real Postgres in CI.
 | ID | Story | Role | Pts | Blocked | Status |
 |---|---|---|---|---|---|
 | **S1-08** | Python project scaffold: packaging, lint, types, test runner | DevOps | 3 | no | ⬜ |
-| **S1-01** | Schema and forward-only migrations for all 13 tables | DEV | 5 | no | ⬜ |
+| **S1-01** | Schema and forward-only migrations for the full schema (17 tables) | DEV | 5 | no | ⬜ |
 | **S1-02** | Deterministic estate generator: services, tiers, dependency graph | DEV | 5 | no | ⬜ |
 | **S1-03** | Telemetry generator: metrics and logs with plausible correlation | DEV | 5 | no | ⬜ |
 | **S1-04** | Incident generator: signatures, severity, causal chains | DEV | 5 | no | ⬜ |
