@@ -39,6 +39,12 @@ ignore = ["E501"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["S101"]  # assert is the point of a test
+# S311 flags `random` as unsuitable for cryptography, which is correct and not
+# what it is doing here: the seed package must produce the SAME estate and the
+# SAME incident from the same seed, which is exactly what a seeded Mersenne
+# Twister gives and what a CSPRNG deliberately does not. Nothing in this package
+# generates a secret. Scoped to seed/ so the rule still applies everywhere else.
+"meridian_agent/seed/*" = ["S311"]
 
 [tool.mypy]
 python_version = "3.11"
