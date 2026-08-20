@@ -67,7 +67,7 @@ _CONTAINS_A_VALUE = re.compile(
 # ── Band edges, derived from measurement ───────────────────────────────────
 #
 # Both were originally chosen by hand from a 22-question set. Measured against
-# 534 labelled examples, SUFFICIENT_ABOVE = 3.0 produced a false-answer rate of
+# labelled examples, SUFFICIENT_ABOVE = 3.0 produced a false-answer rate of
 # 56.6% [50.6, 62.4]: 150 of 265 unanswerable questions were marked sufficient.
 # See docs/06-operations/postmortems/2026-08-20-the-refusal-gate-fails-at-scale.md
 #
@@ -83,16 +83,19 @@ _CONTAINS_A_VALUE = re.compile(
 #: Refuse outright only where at most 2% of answerable questions are lost.
 #: Deliberately conservative: INSUFFICIENT is terminal, while AMBIGUOUS still
 #: reaches adjudication and can still produce an answer.
-#: Measured: refuses 1.9% of answerable, 4.5% of unanswerable.
-INSUFFICIENT_BELOW = 1.41
+#: Measured on 715 examples: refuses 1.8% of answerable, 1.3% of
+#: unanswerable. The band therefore does almost nothing, which is what a
+#: 2% false-refusal budget buys over a signal this weak. It is kept because
+#: an outright-refusal path has to exist, not because it earns its place.
+INSUFFICIENT_BELOW = 0.74
 
 #: Answer without adjudication only where the false-answer rate stays within 5%.
-#: Measured: recall 0.186, false-positive rate 0.038.
+#: Measured on 715 examples: recall 0.149, false-answer rate 0.047.
 #:
 #: That recall is low, and it is the honest consequence of a signal with
 #: AUC 0.631. Most questions now route to adjudication, which is the correct
 #: posture for a gate this weak rather than a shortcoming of the threshold.
-SUFFICIENT_ABOVE = 10.44
+SUFFICIENT_ABOVE = 10.38
 
 #: Fewer than this many query terms present in the top chunks means the question
 #: is about something the corpus does not discuss, whatever the scores say.

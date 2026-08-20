@@ -1,7 +1,7 @@
 {
   "model": "gradient_boosting_uncalibrated",
   "format": "onnx",
-  "trained_on": 534,
+  "trained_on": 715,
   "features": [
     "top_dense",
     "top_lexical",
@@ -17,11 +17,11 @@
     "query_terms"
   ],
   "operating_point": {
-    "threshold": 0.993200945942914,
+    "threshold": 0.9852349160503444,
     "false_answer_budget": 0.05,
-    "recall": 0.3345724907063197,
-    "false_positive_rate": 0.045283018867924525
+    "recall": 0.3661616161616162,
+    "false_positive_rate": 0.047021943573667714
   },
-  "cross_validated_auc": 0.7957284141123658,
-  "baseline_auc": 0.6306375815388932
+  "cross_validated_auc": 0.8082549634273772,
+  "baseline_auc": 0.6085066970646908
 }

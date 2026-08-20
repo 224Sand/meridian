@@ -9,7 +9,7 @@ unanswerable questions as answerable - a false-answer rate of 56.6%. See
 
 ## Training data
 
-534 questions with labels true by construction (ADR-0010). No label was
+715 questions with labels true by construction (ADR-0010). No label was
 assigned by a model; a test asserts the generation path makes no network call.
 Answerable questions are generated FROM a specific chunk. Unanswerable ones come
 from topics verified absent from the corpus, from properties documented for a
@@ -42,11 +42,11 @@ inflates every number with nothing to reveal it.
 
 | Model | ROC AUC |
 |---|---|
-| Heuristic baseline (`dense x lexical`) | 0.631 |
-| **This model** | **0.796** |
+| Heuristic baseline (`dense x lexical`) | 0.609 |
+| **This model** | **0.808** |
 
 Operating point at a 5% false-answer budget: threshold
-0.9932, recall 0.335, false-positive rate 0.045.
+0.9852, recall 0.366, false-positive rate 0.047.
 
 ## Calibration
 
