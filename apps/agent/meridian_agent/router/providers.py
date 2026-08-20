@@ -99,6 +99,10 @@ class StubProvider:
     def is_available(self, environment: str) -> bool:
         return environment in self.available_in
 
+    #: The last user message received. Lets a test assert what a node actually
+    #: SENT, not merely that it called something.
+    last_user_message: str = ""
+
     def complete(
         self,
         messages: Sequence[Message],
@@ -108,6 +112,9 @@ class StubProvider:
         temperature: float,
     ) -> Completion:
         self.calls += 1
+        self.last_user_message = next(
+            (m.content for m in reversed(messages) if m.role == "user"), ""
+        )
         if self.responses:
             outcome = self.responses.pop(0)
         elif self.default is not None:

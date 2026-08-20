@@ -26,6 +26,7 @@ from meridian_agent.router.providers import (
     Completion,
     Message,
     ModelTier,
+    Provider,
     ProviderUnavailableError,
     QuotaExhaustedError,
     RateLimitError,
@@ -265,7 +266,7 @@ class GeminiProvider:
         )
 
 
-def build_default_providers(client: httpx.Client | None = None) -> list[object]:
+def build_default_providers(client: httpx.Client | None = None) -> list[Provider]:
     """The routing order, as configured.
 
     Providers with no key configured report `is_available() is False` and are

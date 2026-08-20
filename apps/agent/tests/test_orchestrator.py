@@ -227,6 +227,97 @@ class TestRefusalAndEscalation:
         assert state["status"] != "completed" or state.get("citations")
 
 
+class TestRetryActuallyRetries:
+    """The retry loop must be able to succeed.
+
+    Found on the first live run: all three attempts returned byte-identical
+    text, the same claims stayed uncited, and every run escalated. Two causes,
+    both of which made the ceiling reachable and the retry impossible:
+
+      * the retry re-sent an IDENTICAL prompt, so it never told the model what
+        was wrong
+      * once the prompt did differ, it differed only by a short correction
+        suffix - 0.886 similar against a 0.60 threshold - so the semantic cache
+        returned the previous answer anyway
+    """
+
+    def build(self, responses: list[str]) -> Dependencies:
+        from meridian_agent.router.cache import SemanticCache
+
+        retriever = HybridRetriever(chunks=chunk_corpus(load_corpus()), embedder=HashingEmbedder())
+        retriever.build_vectors()
+        guard = SpendGuard()
+        guard.open(1.0)
+        return Dependencies(
+            retriever=retriever,
+            router=Router(
+                providers=[StubProvider("stub", responses=list(responses))],
+                state=RouterState(),
+                clock=ManualClock(),
+                environment="test",
+            ),
+            guard=guard,
+            cache=SemanticCache(embedder=HashingEmbedder()),
+        )
+
+    def test_a_correction_retry_reaches_the_model(self) -> None:
+        deps = self.build(
+            [
+                "The pool is exhausted because callers hold connections far too long here.",
+                "[1] The pool is exhausted because callers hold connections too long.",
+                "Compare wait time against query time before acting on this incident.",
+            ]
+        )
+        state = run(
+            deps,
+            "incident_triage",
+            WorkloadInput(
+                subject="inc",
+                body=POOL_INCIDENT.body,
+                context={"service": "analytics-etl", "tier": "3"},
+            ),
+        )
+        assert state["attempts"] == 2, "the retry did not happen"
+        assert state["status"] == "completed", "the corrected attempt was not accepted"
+        assert not state.get("uncited")
+        assert deps.cache is not None
+        assert deps.cache.stats.semantic_hits == 0, (
+            "the correction was served from cache; the retry cannot change anything"
+        )
+
+    def test_the_retry_prompt_names_what_was_uncited(self) -> None:
+        """A retry that does not say what was wrong is a re-roll, not a fix."""
+        from meridian_agent.orchestrator.graph import hypothesise
+
+        deps = self.build(["[1] corrected."])
+        retriever = deps.retriever
+        hits = list(retriever.search(POOL_INCIDENT.body).hits)
+        hypothesise(
+            {
+                "workload": "incident_triage",
+                "request": POOL_INCIDENT,
+                "hits": hits,
+                "uncited": ["The pool exhausted itself spontaneously overnight."],
+                "attempts": 1,
+                "events": [],
+            },
+            deps,
+        )
+        provider = deps.router.providers[0]
+        sent = provider.last_user_message  # type: ignore[attr-defined]
+        assert "NO citation" in sent
+        assert "spontaneously overnight" in sent
+
+    def test_a_first_attempt_uses_the_cache_normally(self) -> None:
+        """Only corrections bypass. A first attempt must still be cacheable, or
+        the cache stops earning its place."""
+        deps = self.build(["[1] cited.", "[1] cited.", "act."])
+        deps.complete("system", "a question about pool exhaustion", tier="large")
+        deps.complete("system", "a question about pool exhaustion", tier="large")
+        assert deps.cache is not None
+        assert deps.cache.stats.exact_hits == 1
+
+
 class TestRiskScoring:
     def test_risk_is_scored_deterministically_not_by_the_model(self) -> None:
         """Asking a model how risky its own suggestion is produces a number that

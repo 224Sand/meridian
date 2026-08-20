@@ -96,17 +96,35 @@ class Dependencies:
     #: Injected so the graph never reads a wall clock, matching the router.
     now: Callable[[], float] = field(default=lambda: 0.0)
 
-    def complete(self, system: str, user: str, *, tier: Literal["fast", "large"]) -> str:
+    def complete(
+        self,
+        system: str,
+        user: str,
+        *,
+        tier: Literal["fast", "large"],
+        bypass_cache: bool = False,
+    ) -> str:
         """The single model-call chokepoint.
 
         Every path that spends a token passes through here, which is what makes
         one spend guard sufficient (ADR-0007). Cache is consulted first, and a
         hit is ledgered at zero rather than skipped, so the saving is a number
         rather than a claim.
+
+        `bypass_cache` exists because a semantic cache is actively harmful to a
+        retry loop. A correction retry differs from its predecessor only by a
+        short suffix naming what was wrong, so the two prompts measure 0.886
+        similar against a 0.60 threshold: the cache returns the previous answer
+        verbatim, the same claims stay uncited, and the run escalates every
+        time. The ceiling was reachable and the retry could never succeed.
+
+        This is ADR-0008's warning arriving from a direction it did not
+        anticipate. The threshold is correct for telling two QUESTIONS apart and
+        wrong for telling a prompt from its own correction.
         """
         messages = [Message("system", system), Message("user", user)]
 
-        if self.cache is not None:
+        if self.cache is not None and not bypass_cache:
             hit = self.cache.lookup(messages, tier=tier, temperature=0.0)
             if hit is not None:
                 self.guard.record_cache_hit(hit.tokens_in, hit.tokens_out)
@@ -224,20 +242,58 @@ def adjudicate(state: RunState, deps: Dependencies) -> RunState:
 
 
 def hypothesise(state: RunState, deps: Dependencies) -> RunState:
+    """Produce the assessment, or correct the previous one.
+
+    A retry MUST name what was wrong with the last attempt. The first version of
+    this node re-sent an identical prompt, which meant:
+
+      * the semantic cache returned the previous answer verbatim
+      * even on a miss, an identical prompt at temperature 0 reproduces it
+
+    so all three attempts were byte-identical, the same claims stayed uncited,
+    and the run escalated every time. The retry ceiling was reachable and the
+    retry itself could never succeed. Observed on the first live run.
+    """
     workload = get_workload(state["workload"])
     passages = "\n\n".join(
         f"[{i + 1}] {hit.chunk.body}" for i, hit in enumerate(state.get("hits", [])[:5])
     )
+
+    uncited = state.get("uncited", [])
+    if uncited:
+        correction = (
+            "\n\nYour previous answer made these statements with NO citation. "
+            "Rewrite it so each one either carries a [n] marker pointing at a "
+            "passage above, or is removed. Do not add claims the passages do "
+            "not support.\n" + "\n".join(f"  - {claim[:200]}" for claim in uncited[:6])
+        )
+    else:
+        correction = ""
+
     text = deps.complete(
         workload.system_prompt(),
         f"Evidence:\n{passages}\n\nSubject: {state['request'].subject}\n"
-        f"{state['request'].body}\n\nGive your assessment. Cite every claim as [n].",
+        f"{state['request'].body}\n\nGive your assessment. Cite every claim as [n]." + correction,
         tier="large",
+        # A correction must never be served from cache. The retry prompt differs
+        # from its predecessor only by the correction suffix - measured 0.886
+        # similar against a 0.60 threshold - so the cache would return the
+        # previous answer and the loop could never succeed.
+        bypass_cache=bool(uncited),
     )
     return {
         "hypothesis": text,
         "attempts": state.get("attempts", 0) + 1,
-        "events": _event(state, "hypothesise", attempt=state.get("attempts", 0) + 1),
+        # Cleared so `verify` judges THIS attempt. Leaving the previous list in
+        # place would make the correction prompt grow with stale claims that the
+        # rewrite may already have fixed.
+        "uncited": [],
+        "events": _event(
+            state,
+            "hypothesise",
+            attempt=state.get("attempts", 0) + 1,
+            correcting=len(uncited),
+        ),
     }
 
 
