@@ -67,6 +67,11 @@ ignore = ["E501"]
 # reproducible from its seed, which is precisely what a CSPRNG refuses to be.
 # No secret is generated here either.
 "meridian_agent/evaluation/*" = ["S311"]
+# S608 flags the interpolated table name in the ANN benchmark. TABLE is a module
+# constant that is never derived from input, the script is offline and not
+# request-facing, and every VALUE in those statements is still parameterised.
+# S311: benchmark vectors must be reproducible from a seed.
+"training/benchmark_ann.py" = ["S608", "S311"]
 
 [tool.mypy]
 python_version = "3.11"

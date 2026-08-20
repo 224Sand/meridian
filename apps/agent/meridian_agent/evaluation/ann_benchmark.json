@@ -1,0 +1,112 @@
+[
+  {
+    "method": "exact",
+    "size": 87,
+    "build_seconds": 0.0,
+    "index_bytes": 0,
+    "p50_ms": 0.48,
+    "p95_ms": 0.52,
+    "recall_at_k": 1.0,
+    "distance_ratio": 1.0
+  },
+  {
+    "method": "hnsw",
+    "size": 87,
+    "build_seconds": 0.066,
+    "index_bytes": 368640,
+    "p50_ms": 0.48,
+    "p95_ms": 0.54,
+    "recall_at_k": 1.0,
+    "distance_ratio": 1.0
+  },
+  {
+    "method": "exact",
+    "size": 1000,
+    "build_seconds": 0.0,
+    "index_bytes": 0,
+    "p50_ms": 5.35,
+    "p95_ms": 6.03,
+    "recall_at_k": 1.0,
+    "distance_ratio": 1.0
+  },
+  {
+    "method": "hnsw",
+    "size": 1000,
+    "build_seconds": 0.513,
+    "index_bytes": 4104192,
+    "p50_ms": 5.31,
+    "p95_ms": 5.68,
+    "recall_at_k": 1.0,
+    "distance_ratio": 1.0
+  },
+  {
+    "method": "ivfflat",
+    "size": 1000,
+    "build_seconds": 0.086,
+    "index_bytes": 4169728,
+    "p50_ms": 5.31,
+    "p95_ms": 5.92,
+    "recall_at_k": 1.0,
+    "distance_ratio": 1.0
+  },
+  {
+    "method": "exact",
+    "size": 5000,
+    "build_seconds": 0.0,
+    "index_bytes": 0,
+    "p50_ms": 26.47,
+    "p95_ms": 30.87,
+    "recall_at_k": 1.0,
+    "distance_ratio": 1.0
+  },
+  {
+    "method": "hnsw",
+    "size": 5000,
+    "build_seconds": 3.786,
+    "index_bytes": 20488192,
+    "p50_ms": 2.58,
+    "p95_ms": 2.81,
+    "recall_at_k": 0.686,
+    "distance_ratio": 1.0026
+  },
+  {
+    "method": "ivfflat",
+    "size": 5000,
+    "build_seconds": 0.44,
+    "index_bytes": 20791296,
+    "p50_ms": 1.61,
+    "p95_ms": 2.06,
+    "recall_at_k": 0.57,
+    "distance_ratio": 1.0068
+  },
+  {
+    "method": "exact",
+    "size": 20000,
+    "build_seconds": 0.0,
+    "index_bytes": 0,
+    "p50_ms": 107.63,
+    "p95_ms": 113.39,
+    "recall_at_k": 1.0,
+    "distance_ratio": 1.0
+  },
+  {
+    "method": "hnsw",
+    "size": 20000,
+    "build_seconds": 34.248,
+    "index_bytes": 81928192,
+    "p50_ms": 3.87,
+    "p95_ms": 4.29,
+    "recall_at_k": 0.37,
+    "distance_ratio": 1.0076
+  },
+  {
+    "method": "ivfflat",
+    "size": 20000,
+    "build_seconds": 3.038,
+    "index_bytes": 83140608,
+    "p50_ms": 1.94,
+    "p95_ms": 2.31,
+    "recall_at_k": 0.226,
+    "distance_ratio": 1.0162
+  }
+]
