@@ -12,8 +12,27 @@ export type Citation = {
   resolved: boolean;
 };
 
+export type Span = {
+  name: NodeName;
+  start_ms: number;
+  duration_ms: number;
+  calls: number;
+  cache_hits: number;
+};
+
+export type LedgerEntry = {
+  provider: string;
+  model: string;
+  tokens_in: number;
+  tokens_out: number;
+  estimated_usd: number;
+  actual_usd: number;
+  cache_hit: boolean;
+};
+
 export type NodeEvent = {
   node: NodeName;
+  duration_ms?: number;
   hits?: number;
   degraded?: boolean;
   top_documents?: string[];
@@ -39,6 +58,9 @@ export type RunCompleted = {
   cost_usd: number;
   tokens_avoided: number;
   providers: { provider: string; event: string }[];
+  total_ms: number;
+  spans: Span[];
+  ledger: LedgerEntry[];
 };
 
 export type StreamEvent =

@@ -96,6 +96,26 @@ class Dependencies:
     #: Injected so the graph never reads a wall clock, matching the router.
     now: Callable[[], float] = field(default=lambda: 0.0)
 
+    def _worst_case_provider(self) -> str:
+        """The costliest provider that could serve the next call.
+
+        Worst case over the candidates, not a guess at which one will answer.
+        A reservation is only a bound if it holds however the router routes.
+        """
+        from sandscope_agent.orchestrator.budget import UNKNOWN_PRICE, price
+
+        candidates = [
+            p.name
+            for p in self.router.providers
+            if p.is_available(self.router.environment)
+            and not self.router.state.is_disabled(p.name, self.router.clock.now())
+        ]
+        if not candidates:
+            return "unknown"
+        return max(
+            candidates, key=lambda name: price(name, 1_000_000, 1_000_000) or sum(UNKNOWN_PRICE)
+        )
+
     def complete(
         self,
         system: str,
@@ -130,10 +150,19 @@ class Dependencies:
                 self.guard.record_cache_hit(hit.tokens_in, hit.tokens_out)
                 return hit.response
 
-        # Reserve BEFORE the call. A reservation after the response is accounting.
+        # Reserve BEFORE the call, at the price of the MOST EXPENSIVE provider
+        # that could serve it.
+        #
+        # The first version priced against providers[0] and was wrong by 4x on
+        # the first trace that showed it: reserved $0.000100 at Groq's rate,
+        # spent $0.000404 at Mistral's after failover. Any provider in the
+        # order can serve a request - that is the entire point of the router -
+        # so pricing against the cheapest one under-reserves exactly when
+        # failover has made the call expensive, which is the case the guard
+        # exists to bound.
         estimated_in = sum(len(m.content) // 3 for m in messages)
         estimate = self.guard.reserve(
-            self.router.providers[0].name if self.router.providers else "unknown",
+            self._worst_case_provider(),
             tier,
             max_tokens_in=estimated_in,
             max_tokens_out=MAX_TOKENS,

@@ -393,3 +393,56 @@ class TestDeterministicNodes:
         nodes = [e["node"] for e in state["events"]]
         assert nodes[0] == "classify"
         assert "retrieve" in nodes and "assess_evidence" in nodes
+
+
+class TestReservationBoundsActualCost:
+    """D-010. A reservation is only a bound if it holds however the router routes.
+
+    The first version priced against providers[0] and under-reserved by 4x the
+    moment failover reached a more expensive provider: $0.000100 reserved at
+    Groq's rate against $0.000404 spent at Mistral's. That is the exact case the
+    guard exists to bound.
+    """
+
+    def build(self) -> Dependencies:
+        retriever = HybridRetriever(chunks=chunk_corpus(load_corpus()), embedder=HashingEmbedder())
+        retriever.build_vectors()
+        guard = SpendGuard()
+        guard.open(1.0)
+        # Cheapest first, most expensive last - the order that broke it.
+        providers = [
+            StubProvider("groq", default="cheap"),
+            StubProvider("mistral", default="expensive"),
+        ]
+        return Dependencies(
+            retriever=retriever,
+            router=Router(
+                providers=providers,
+                state=RouterState(),
+                clock=ManualClock(),
+                environment="test",
+            ),
+            guard=guard,
+        )
+
+    def test_the_reservation_prices_the_most_expensive_candidate(self) -> None:
+        from sandscope_agent.orchestrator.budget import price
+
+        deps = self.build()
+        deps.complete("system", "a question", tier="large")
+        entry = deps.guard.ledger[-1]
+        # Groq would have been cheaper; the reservation must not assume it.
+        groq_rate = price("groq", 1000, 700)
+        mistral_rate = price("mistral", 1000, 700)
+        assert mistral_rate > groq_rate
+        assert entry.estimated_usd >= entry.actual_usd, (
+            f"reserved ${entry.estimated_usd:.6f} against ${entry.actual_usd:.6f} spent"
+        )
+
+    def test_the_reservation_covers_the_spend_across_many_calls(self) -> None:
+        deps = self.build()
+        for _ in range(5):
+            deps.complete("system", "a question about pool exhaustion", tier="large")
+        assert deps.guard.reserved_usd >= deps.guard.actual_usd, (
+            f"reserved ${deps.guard.reserved_usd:.6f} < spent ${deps.guard.actual_usd:.6f}"
+        )

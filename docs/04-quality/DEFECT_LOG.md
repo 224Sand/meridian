@@ -17,15 +17,19 @@
 | D-005 | Sprint 5 | 4 | 2 | Retry loop re-sent an identical prompt, so it could never succeed | Design oversight: the edge existed, the feedback did not | Fixed, guarded |
 | D-006 | Sprint 5 | 4 | **1** | Semantic cache served the previous answer to a correction retry (0.886 similarity vs 0.60 threshold) | **Emergent interaction between two individually correct, individually measured components** | Fixed, guarded |
 | D-007 | Sprint 5 | 4 | 2 | `RUN_BUDGET_USD=0` killed every run mid-stream with an unhandled error | Fail-fast not applied to configuration | Fixed, guarded |
+| D-008 | Sprint 5 | 5 | 2 | CSP blocked React hydration in development; every button was inert HTML | A policy correct for production made development impossible | Fixed, guarded |
+| D-009 | Sprint 5 | 5 | **1** | The console displayed assessments the governance layer had refused to emit | Rendering ignored the run outcome | Fixed, guarded |
+| D-010 | Sprint 5 | 4 | **1** | Spend reservation priced against `providers[0]`, under-reserving 4x when failover reached a costlier provider | The guard assumed the cheapest candidate would serve | Fixed, guarded |
 
 ## Where these were found, which is the finding
 
 | Found by | Count |
 |---|---|
-| Running the assembled system for the first time | **3** (D-005, D-006, D-007) |
+| Running the assembled system | **5** (D-005, D-006, D-007, D-008, D-009) |
 | Measuring against a large labelled set | 2 (D-001, D-002) |
 | CI against a real database | 1 (D-004) |
 | Re-running a measurement after a change | 1 (D-003) |
+| Reading a trace the product renders about itself | 1 (D-010) |
 | **Code review** | **0** |
 | **Unit tests written before the defect** | **0** |
 

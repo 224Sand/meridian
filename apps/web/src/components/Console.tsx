@@ -11,6 +11,7 @@
 
 import { useCallback, useRef, useState } from "react";
 
+import Trace from "@/components/Trace";
 import { readEvents, type Citation, type NodeEvent, type RunCompleted } from "@/lib/events";
 
 const PRESETS = [
@@ -359,6 +360,8 @@ export default function Console() {
           )}
         </section>
       )}
+
+      {result && <Trace spans={result.spans} ledger={result.ledger} totalMs={result.total_ms} />}
 
       {result && (
         <section className="panel">

@@ -195,11 +195,39 @@ def stream_run(request: RunRequest) -> StreamingResponse:
         yield _sse("run_started", {"run_id": run_id, "workload": request.workload})
 
         final: dict[str, Any] = {}
+        spans: list[dict[str, Any]] = []
+        run_started = time.perf_counter()
+        node_started = run_started
         try:
             for update in graph.stream(initial, stream_mode="updates"):
                 for node, patch in update.items():
+                    now = time.perf_counter()
+                    span = {
+                        "name": node,
+                        "start_ms": round((node_started - run_started) * 1000, 2),
+                        "duration_ms": round((now - node_started) * 1000, 2),
+                        # Which model calls happened inside this node, taken from
+                        # the ledger's growth rather than from instrumentation
+                        # inside the node - the chokepoint already records every
+                        # one, so counting there cannot drift from reality.
+                        "calls": len(deps.guard.ledger) - sum(s["calls"] for s in spans),
+                        "cache_hits": sum(
+                            1
+                            for e in deps.guard.ledger[sum(s["calls"] for s in spans) :]
+                            if e.cache_hit
+                        ),
+                    }
+                    spans.append(span)
+                    node_started = now
                     final.update(patch)
-                    yield _sse("node_completed", {"node": node, **_summarise(node, patch)})
+                    yield _sse(
+                        "node_completed",
+                        {
+                            "node": node,
+                            "duration_ms": span["duration_ms"],
+                            **_summarise(node, patch),
+                        },
+                    )
         except Exception as error:
             # Fail closed and say so. A stream that stops without an error event
             # is indistinguishable from a network drop at the client.
@@ -217,6 +245,20 @@ def stream_run(request: RunRequest) -> StreamingResponse:
                 "cost_usd": round(deps.guard.actual_usd, 6),
                 "tokens_avoided": deps.guard.tokens_avoided,
                 "providers": [{"provider": e.provider, "event": e.event} for e in router_events],
+                "total_ms": round((time.perf_counter() - run_started) * 1000, 2),
+                "spans": spans,
+                "ledger": [
+                    {
+                        "provider": e.provider,
+                        "model": e.model,
+                        "tokens_in": e.tokens_in,
+                        "tokens_out": e.tokens_out,
+                        "estimated_usd": float(e.estimated_usd),
+                        "actual_usd": float(e.actual_usd or 0.0),
+                        "cache_hit": e.cache_hit,
+                    }
+                    for e in deps.guard.ledger
+                ],
             },
         )
 
