@@ -19,12 +19,29 @@ deliberately not tested, and how the quality gates enforce it.
 | **Contract** | The BFF↔runtime HTTP contract, asserted from both sides against one schema | `pytest` + generated types | Every push |
 | **Integration** | Graph execution end to end against a real database and a stubbed provider | `pytest` + ephemeral Postgres | Every push |
 | **Evaluation** | Retrieval and generation quality against fixed golden sets | Eval harness | Every push, non-blocking on the probe suite |
-| **End-to-end** | Browser drives a real triage run through both services | Playwright | Pre-release |
+| **End-to-end** | Browser drives a real triage run through both services | Playwright | **Every push, from Sprint 5** |
+| **Smoke** | The assembled system executes one real run | `scripts/smoke.py` | **Every push, from Sprint 5** |
 | **Governance** | Requirements traced, config valid, no secrets | `scripts/check-*.mjs` | Every push |
 
 The shape is deliberate: the expensive, slow, flaky layers stay thin, and the
 properties that actually decide correctness — routing order, refusal thresholds,
 approval topology — are tested where they are cheap and deterministic.
+
+**Corrected in Sprint 5.** End-to-end was originally scheduled "Pre-release",
+which deferred the only layer that exercises the assembled system to Sprint 8.
+Four sprints and 412 passing tests later, the first actual execution of the
+system found three defects in ten minutes (D-005, D-006, D-007), one of which
+(D-006) was an emergent interaction between two individually correct components
+and was unreachable by any unit test.
+
+Definition of Done item 7 — *"Demonstrable: it can be shown working, not
+described as working"* — was written at Sprint 0 and enforced zero times across
+five sprint reviews. Every review reported delivery; none demonstrated the
+system running. The rule existed and the gate did not, which is worse than not
+having written the rule.
+
+A thin end-to-end layer that runs is worth more than a thorough one that is
+scheduled.
 
 ## 3. Determinism policy
 
