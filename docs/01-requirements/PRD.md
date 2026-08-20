@@ -79,6 +79,21 @@ graph would have been easier and would have proven nothing.
 | **FR-015** | Evaluation harness | Golden-set results across groundedness, citation accuracy, refusal correctness | Should |
 | **FR-016** | Known-limitation probe set | A second golden set that reports a warning on every run, documenting a failure mode that was not engineered away | Should |
 
+### 4.2b Applied machine learning and evaluation science
+
+Added 2026-08-20 on Product Owner observation. Until this point the system
+contained no trained model and no statistical rigour: every threshold had been
+set from the minimum and maximum of a 20-question set. That is a defensible
+starting point and it is not evidence that any threshold is correct.
+
+| ID | Feature | Description | Priority |
+|---|---|---|---|
+| **FR-026** | Labelled evaluation dataset | ~600 questions with labels true by construction, split by document to prevent leakage | Must |
+| **FR-027** | Statistical evaluation of the refusal gate | ROC and precision-recall curves, operating point by Youden's J, bootstrap confidence intervals, McNemar's test between configurations, power analysis for dataset size | Must |
+| **FR-028** | Trained evidence-sufficiency classifier | Calibrated probabilistic classifier over engineered retrieval features, measured against the heuristic baseline and reported either way | Must |
+| **FR-029** | Cross-encoder re-ranker | Fine-tuned offline in PyTorch, exported to ONNX, served without the training framework | Should |
+| **FR-030** | Approximate nearest neighbour benchmark | pgvector HNSW against IVFFlat, exact search and a managed vector store, on recall@k, latency percentiles, build time and memory | Should |
+
 ### 4.3 Experience surface
 
 | ID | Feature | Description | Priority |
@@ -138,11 +153,12 @@ graph would have been easier and would have proven nothing.
 | Release | Contents | Gate |
 |---|---|---|
 | **0.1.0** Foundation | Schema, seeded estate, telemetry, corpus, retrieval | Sprint Review ✅ |
-| **0.2.0** Agent Core I | Router, providers, semantic cache, hybrid retrieval, refusal | Sprint Review |
-| **0.3.0** Agent Core II | Workloads, orchestrator, governance, approval, spend, evals | Sprint Review |
-| **0.4.0** Console | BFF, streaming triage, trace viewer, approval, memory | UAT |
-| **0.5.0** Experience | Narrative surface, motion system | Design Review + UAT |
-| **0.6.0** Proof | Delivery, reliability and architecture surfaces | UAT |
+| **0.2.0** Agent Core I | Router, providers, semantic cache, hybrid retrieval, refusal | Sprint Review ✅ |
+| **0.3.0** Applied ML | Labelled dataset, statistical evaluation, trained classifier, re-ranker, ANN benchmark | Sprint Review |
+| **0.4.0** Agent Core II | Workloads, orchestrator, governance, approval, spend, evals | Sprint Review |
+| **0.5.0** Console | BFF, streaming triage, trace viewer, approval, memory | UAT |
+| **0.6.0** Experience | Narrative surface, motion system | Design Review + UAT |
+| **0.7.0** Proof | Delivery, reliability and architecture surfaces | UAT |
 | **1.0.0** Release | Hardened, load-tested, deployed | Release Approval |
 
 If effort runs short, releases ship **in order and complete**. A half-finished

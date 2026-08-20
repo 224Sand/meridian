@@ -115,11 +115,17 @@ demonstration, and a retrospective with one committed improvement.
 | **0** Inception | Concept | Requirements, Design | Ideation, Validation, Definition | 1 | — |
 | **1** Foundation | Prototype | Implementation, Testing | Development | 2, 4 (partial) | 0.1.0 |
 | **2** Agent Core I | MVP | Design, Implementation, Testing | Development | 3, 4, 7 | 0.2.0 |
-| **3** Agent Core II | MVP | Implementation, Testing | Development | 5, 6 | 0.3.0 |
-| **4** Console | MVP | Implementation, Testing | Development, UAT | 8 | 0.4.0 |
-| **5** Experience | Beta | Implementation | Design, Development | — | 0.5.0 |
-| **6** Proof Surfaces | Beta | Implementation, Testing | Development, UAT | 8 | 0.6.0 |
-| **7** Release | GA | Testing, Deployment | Launch | 7, 8 | 1.0.0 |
+| **3** Applied ML & Evaluation | MVP | Design, Implementation, Testing | Development | **2, 4, 5** | 0.3.0 |
+| **4** Agent Core II | MVP | Implementation, Testing | Development | 5, 6 | 0.4.0 |
+| **5** Console | MVP | Implementation, Testing | Development, UAT | 8 | 0.5.0 |
+| **6** Experience | Beta | Implementation | Design, Development | — | 0.6.0 |
+| **7** Proof Surfaces | Beta | Implementation, Testing | Development, UAT | 8 | 0.7.0 |
+| **8** Release | GA | Testing, Deployment | Launch | 7, 8 | 1.0.0 |
+
+Sprint 3 is the first to sit squarely in **AIDLC-5 (Evaluation design)**. Until
+it lands, this project has run four sprints of SDLC without entering AIDLC-5 at
+all — which is precisely the pattern §4 warns about, and it took the Product
+Owner rather than the delivery team to notice.
 
 ## 7. Task label format
 

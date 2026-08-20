@@ -118,19 +118,22 @@ optimism. Burndown is derived from real commit timestamps.
 | Sprint | Name | Goal | Exit gate |
 |---|---|---|---|
 | **0** | Inception | Requirements, charter, PRD, BRD, tech spec, ADRs, repo, green CI | **Requirements Sign-off** ✅ |
-| **1** | Foundation | Data layer, seeded production estate, telemetry, corpus, retrieval | Sprint Review ✅ |
-| **2** | Agent Core I | Deterministic router, providers, semantic cache, hybrid retrieval, refusal gate | Sprint Review |
-| **3** | Agent Core II | Workload abstraction, orchestrator, governance, approval, spend guard, evals | Sprint Review |
-| **4** | Console | BFF, SSE streaming, trace viewer, approval UI, session memory | **UAT** |
-| **5** | Experience | The `/` Apple-grade surface, motion system, video pipeline | Design Review + UAT |
-| **6** | Proof Surfaces | `/delivery`, `/reliability`, `/architecture` | UAT |
-| **7** | Hardening & Release | Load test, e2e, threat model review, runbook, observability, deploy | **Release Approval** |
+| **1** | Foundation | Data layer, seeded estate, telemetry, corpus, retrieval | Sprint Review ✅ |
+| **2** | Agent Core I | Deterministic router, providers, semantic cache, hybrid retrieval, refusal gate | Sprint Review ✅ |
+| **3** | Applied ML & Evaluation Science | Labelled dataset, statistical evaluation, trained classifier, PyTorch re-ranker, ANN benchmark | Sprint Review |
+| **4** | Agent Core II | Workload abstraction, orchestrator, governance, approval, spend guard, eval harness | Sprint Review |
+| **5** | Console | BFF, SSE streaming, trace viewer, approval UI, session memory | **UAT** |
+| **6** | Experience | The `/` Apple-grade surface, motion system, video pipeline | Design Review + UAT |
+| **7** | Proof Surfaces | `/delivery`, `/reliability`, `/architecture` | UAT |
+| **8** | Hardening & Release | Load test, e2e, threat model review, runbook, observability, deploy | **Release Approval** |
 
-**Re-planned 2026-08-20.** The Product Owner added a second workload (change
-risk review) and corpus depth at the Sprint 1 review. Sprint 2 as originally
-scoped came to 62 points against a demonstrated velocity of 41. Splitting the
-agent core across two sprints is the honest response; carrying 62 points and
-reporting a miss would not be.
+**Re-planned twice, both times on Product Owner input.** 2026-08-20 first split the
+agent core across two sprints when a second workload was added. The same day, the
+Product Owner observed that the system contained no trained model and no
+statistical rigour anywhere — every threshold had been set from the minimum and
+maximum of a 20-question set, which is not statistics. Sprint 3 is inserted to
+close that, and deliberately runs **before** the orchestrator so the classifier
+and the calibrated operating points exist before the graph is built around them.
 
 ---
 
