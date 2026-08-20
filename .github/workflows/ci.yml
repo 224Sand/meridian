@@ -63,7 +63,7 @@ jobs:
       - name: Install
         run: |
           python -m pip install --upgrade pip
-          pip install -e ".[dev]"
+          pip install -e ".[dev,ml]"
 
       - name: Lint
         run: ruff check .
@@ -78,6 +78,11 @@ jobs:
         # Must pass with no DATABASE_URL at all: the offline suite is what runs
         # on a contributor machine with no credentials.
         run: pytest -q -m "not integration"
+
+      - name: Verify hand-written statistics against the reference libraries
+        # Kept as its own step so a disagreement with scikit-learn or scipy
+        # reads as exactly that, rather than as one failure among many.
+        run: pytest -q tests/test_statistics.py
 
       - name: Integration test suite
         env:

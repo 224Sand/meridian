@@ -19,6 +19,16 @@ dev = [
   "ruff>=0.7",
   "mypy>=1.13",
 ]
+# Training and reference-implementation dependencies. NOT runtime dependencies
+# (ADR-0009): models are trained offline and served without their framework, and
+# meridian_agent.evaluation.statistics is written against the standard library
+# so the shipped code carries none of this. These exist so tests can check that
+# hand-written statistics agree with the reference implementations.
+ml = [
+  "numpy>=2.1",
+  "scipy>=1.14",
+  "scikit-learn>=1.5",
+]
 
 [build-system]
 requires = ["setuptools>=68"]
@@ -38,7 +48,10 @@ select = ["E", "F", "I", "B", "UP", "S", "RUF"]
 ignore = ["E501"]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/*" = ["S101"]  # assert is the point of a test
+# S101: assert is the point of a test.
+# S311: fixtures must be reproducible from a seed, which is exactly what a
+#       CSPRNG refuses to be. No test generates a secret.
+"tests/*" = ["S101", "S311"]
 # S311 flags `random` as unsuitable for cryptography, which is correct and not
 # what it is doing here: the seed package must produce the SAME estate and the
 # SAME incident from the same seed, which is exactly what a seeded Mersenne
@@ -64,4 +77,5 @@ asyncio_mode = "auto"
 # with no credentials at all (IMP-04).
 markers = [
   "integration: requires a live Postgres (skipped when DATABASE_URL is unset)",
+  "ml: requires the ml extra (numpy/scipy/scikit-learn), which is training-time only",
 ]

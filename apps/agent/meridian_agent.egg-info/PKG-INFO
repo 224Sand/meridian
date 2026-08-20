@@ -14,3 +14,7 @@ Requires-Dist: pytest>=8.3; extra == "dev"
 Requires-Dist: pytest-asyncio>=0.24; extra == "dev"
 Requires-Dist: ruff>=0.7; extra == "dev"
 Requires-Dist: mypy>=1.13; extra == "dev"
+Provides-Extra: ml
+Requires-Dist: numpy>=2.1; extra == "ml"
+Requires-Dist: scipy>=1.14; extra == "ml"
+Requires-Dist: scikit-learn>=1.5; extra == "ml"

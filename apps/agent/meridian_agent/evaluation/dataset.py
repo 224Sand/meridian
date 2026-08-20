@@ -312,6 +312,10 @@ _DOCUMENTED_PROPERTIES: tuple[tuple[str, str, tuple[str, ...]], ...] = (
     ("maximum acceptable freshness lag", "tier 1 consumers", ("freshness", "300")),
     ("escalation timer", "severity 1", ("30 minutes",)),
     ("idle transaction termination threshold", "orders-db", ("60 seconds",)),
+    ("consumer lag paging threshold", "events-bus", ("1,000,000",)),
+    ("hit ratio recovery target", "sessions-cache", ("0.70",)),
+    ("shard imbalance threshold", "catalog-search", ("2.0",)),
+    ("certificate expiry alert threshold", "the edge listener", ("21",)),
 )
 
 #: Entities the corpus never documents the above properties for.
@@ -324,6 +328,16 @@ _UNDOCUMENTED_ENTITIES = (
     "fraud-scoring",
     "recommendation-service",
     "notification-service",
+    "identity-service",
+    "checkout-api",
+    "catalog-api",
+    "inventory-service",
+    "order-orchestrator",
+    "search-indexer",
+    "config-service",
+    "analytics-etl",
+    "reporting-batch",
+    "payments-gateway",
 )
 
 
@@ -351,6 +365,7 @@ def generate_property_transfer_questions(chunks: list[Chunk]) -> list[Question]:
             for template in (
                 "what is the {prop} for {entity}",
                 "what {prop} is configured on {entity}",
+                "what value is set as the {prop} on {entity}",
             ):
                 questions.append(
                     Question(
@@ -381,20 +396,24 @@ def generate_presupposition_questions(chunks: list[Chunk]) -> list[Question]:
         if not wrong:
             continue
         signal = pattern.primary[0]
-        for service in wrong[:3]:
+        for service in wrong[:6]:
             if _corpus_contains_all(chunks, (service.name.lower(), signal.metric.lower())):
                 continue
-            questions.append(
-                Question(
-                    id=f"q-pre-{index:03d}",
-                    text=f"what is the expected {signal.metric} baseline on {service.name}",
-                    label=Label.UNANSWERABLE,
-                    mechanism=Mechanism.PRESUPPOSITION,
-                    gold_document_id=None,
-                    group=f"__pre__{pattern.id}",
+            for template in (
+                "what is the expected {metric} baseline on {service}",
+                "what threshold is set for {metric} on {service}",
+            ):
+                questions.append(
+                    Question(
+                        id=f"q-pre-{index:03d}",
+                        text=template.format(metric=signal.metric, service=service.name),
+                        label=Label.UNANSWERABLE,
+                        mechanism=Mechanism.PRESUPPOSITION,
+                        gold_document_id=None,
+                        group=f"__pre__{pattern.id}",
+                    )
                 )
-            )
-            index += 1
+                index += 1
     return questions
 
 
@@ -416,6 +435,76 @@ class Dataset:
             key = f"{question.label}/{question.mechanism}"
             counts[key] = counts.get(key, 0) + 1
         return dict(sorted(counts.items()))
+
+
+#: No single construction mechanism may exceed this share of the dataset.
+#: Property transfer generates combinatorially - properties multiplied by
+#: entities multiplied by templates - and reached 52% of all examples on its
+#: own. A classifier trained on that learns to recognise one template's
+#: phrasing rather than answerability, and reports a high score for doing so.
+MAX_MECHANISM_SHARE = 0.30
+
+
+def _cap_by_mechanism(questions: list[Question], max_share: float) -> list[Question]:
+    """Subsample over-represented mechanisms, round-robin across their groups.
+
+    Round-robin rather than truncation: taking the first N would drop entire
+    entities, and the entity is what makes a property-transfer example hard.
+    Deterministic, because the dataset must be reproducible.
+    """
+    by_mechanism: dict[str, list[Question]] = {}
+    for question in questions:
+        by_mechanism.setdefault(str(question.mechanism), []).append(question)
+
+    cap = max(1, int(len(questions) * max_share))
+
+    kept: list[Question] = []
+    for mechanism in sorted(by_mechanism):
+        members = by_mechanism[mechanism]
+        if len(members) <= cap:
+            kept.extend(members)
+            continue
+
+        by_group: dict[str, list[Question]] = {}
+        for question in sorted(members, key=lambda q: q.id):
+            by_group.setdefault(question.group, []).append(question)
+
+        selected: list[Question] = []
+        groups = sorted(by_group)
+        index = 0
+        while len(selected) < cap:
+            progressed = False
+            for group in groups:
+                bucket = by_group[group]
+                if index < len(bucket):
+                    selected.append(bucket[index])
+                    progressed = True
+                    if len(selected) >= cap:
+                        break
+            if not progressed:
+                break
+            index += 1
+        kept.extend(selected)
+
+    return sorted(kept, key=lambda q: q.id)
+
+
+def cap_mechanisms(questions: list[Question], max_share: float) -> list[Question]:
+    """Apply the share cap to a fixed point.
+
+    One pass is not enough and the reason is easy to miss: the cap is a fraction
+    of the total, and capping reduces the total. A single pass capped property
+    transfer at 30% of 785 and left it at 38.6% of the resulting 609. Iterating
+    converges - each pass lowers the ceiling as the total falls - and it stops
+    when nothing changes rather than after a guessed number of rounds.
+    """
+    current = questions
+    for _ in range(20):
+        capped = _cap_by_mechanism(current, max_share)
+        if len(capped) == len(current):
+            return capped
+        current = capped
+    return current
 
 
 def build_questions(
@@ -443,7 +532,7 @@ def build_questions(
             continue
         seen.add(key)
         unique.append(question)
-    return unique
+    return cap_mechanisms(unique, MAX_MECHANISM_SHARE)
 
 
 def split_by_group(
