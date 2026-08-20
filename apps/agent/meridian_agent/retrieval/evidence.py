@@ -64,15 +64,36 @@ _CONTAINS_A_VALUE = re.compile(
     re.IGNORECASE,
 )
 
-#: Below this, retrieved material is clearly too weak to answer from. Set from
-#: the measurement above: the strongest unanswerable question scored 2.00 and
-#: the weakest answerable scored 2.11, so a single boundary between them would
-#: have a margin of 0.11 on a product of two noisy signals. These bands are
-#: deliberately placed to leave that overlap UNRESOLVED rather than to guess at
-#: it.
-INSUFFICIENT_BELOW = 1.5
-#: Above this, the evidence is clearly strong enough to proceed.
-SUFFICIENT_ABOVE = 3.0
+# ── Band edges, derived from measurement ───────────────────────────────────
+#
+# Both were originally chosen by hand from a 22-question set. Measured against
+# 534 labelled examples, SUFFICIENT_ABOVE = 3.0 produced a false-answer rate of
+# 56.6% [50.6, 62.4]: 150 of 265 unanswerable questions were marked sufficient.
+# See docs/06-operations/postmortems/2026-08-20-the-refusal-gate-fails-at-scale.md
+#
+# They are now selected from the ROC curve against explicit error budgets, and
+# the budgets are asymmetric because the errors are:
+#
+#   answering something unsupported  -> the failure this product exists to stop
+#   refusing something answerable    -> a follow-up question
+#
+# Re-derive with training/derive_thresholds.py after any change to retrieval,
+# the embedder, or the corpus. Do not nudge these by hand.
+
+#: Refuse outright only where at most 2% of answerable questions are lost.
+#: Deliberately conservative: INSUFFICIENT is terminal, while AMBIGUOUS still
+#: reaches adjudication and can still produce an answer.
+#: Measured: refuses 1.9% of answerable, 4.5% of unanswerable.
+INSUFFICIENT_BELOW = 1.41
+
+#: Answer without adjudication only where the false-answer rate stays within 5%.
+#: Measured: recall 0.186, false-positive rate 0.038.
+#:
+#: That recall is low, and it is the honest consequence of a signal with
+#: AUC 0.631. Most questions now route to adjudication, which is the correct
+#: posture for a gate this weak rather than a shortcoming of the threshold.
+SUFFICIENT_ABOVE = 10.44
+
 #: Fewer than this many query terms present in the top chunks means the question
 #: is about something the corpus does not discuss, whatever the scores say.
 MIN_TERM_COVERAGE = 0.30

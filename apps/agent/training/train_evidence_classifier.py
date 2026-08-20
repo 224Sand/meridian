@@ -38,7 +38,9 @@ from meridian_agent.retrieval.corpus import chunk_corpus, load_corpus
 from meridian_agent.retrieval.embedding import HashingEmbedder
 from meridian_agent.retrieval.hybrid import HybridRetriever
 
-ARTIFACT = Path(__file__).resolve().parents[1] / "meridian_agent" / "evaluation" / "evidence_model.json"
+ARTIFACT = (
+    Path(__file__).resolve().parents[1] / "meridian_agent" / "evaluation" / "evidence_model.json"
+)
 #: Answering something the corpus cannot support is the expensive error, so the
 #: false-positive rate is a constraint rather than something to trade away.
 FALSE_POSITIVE_BUDGET = 0.05
@@ -192,9 +194,7 @@ def main() -> None:
     print(f"\nWrote {ARTIFACT.relative_to(ARTIFACT.parents[2])}")
 
     print("\nLogistic coefficients (standardised, so magnitudes compare):")
-    for name, weight in sorted(
-        zip(names, model.coef_[0], strict=True), key=lambda kv: -abs(kv[1])
-    ):
+    for name, weight in sorted(zip(names, model.coef_[0], strict=True), key=lambda kv: -abs(kv[1])):
         print(f"  {name:<20} {weight:+.3f}")
 
 
