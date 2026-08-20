@@ -88,3 +88,16 @@ jobs:
         env:
           DATABASE_URL: postgresql://meridian:meridian@localhost:5432/meridian_test
         run: pytest -q -m integration
+
+      - name: Evaluation suites
+        # golden/core blocks. golden/probe warns and never blocks: a probe suite
+        # that could fail the build would be tuned until it stopped complaining,
+        # and the limitations it records would vanish without being fixed.
+        run: python training/run_evaluation.py
+
+      - name: Upload evaluation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evaluation-report
+          path: apps/agent/reports/evaluation.json

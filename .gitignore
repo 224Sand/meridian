@@ -45,3 +45,6 @@ htmlcov/
 
 # Training venv, isolated from the serving environment (ADR-0009).
 .venv-train/
+
+# Evaluation output is regenerated on every CI run and uploaded as an artifact.
+apps/agent/reports/
