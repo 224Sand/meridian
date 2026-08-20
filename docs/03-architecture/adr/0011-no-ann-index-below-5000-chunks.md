@@ -103,3 +103,61 @@ interacting with it.
 **Negative.** A corpus that grows past 5,000 chunks without anyone re-running the
 benchmark will get slow before it gets fixed. The revisit trigger is written
 above rather than left to be noticed.
+
+---
+
+## Addendum, 2026-08-20 — the managed vector store arm
+
+FR-030 named "a managed vector store" as the fourth arm. Upstash Vector was
+provisioned (768 dimensions, cosine, dense, `eu-west-1`) and the arm is
+**deferred**, for two reasons that are themselves results.
+
+### The free tier allows 10,000 writes per day
+
+Every upserted vector counts as one write. The sweep as designed — 87 + 1,000 +
+5,000 + 20,000 — needs **26,087**, and exhausted the allowance partway through
+the third size:
+
+```
+{"error":"Exceeded daily write limit: 10000","status":403}
+```
+
+That is an operational property worth knowing before choosing the store, not an
+obstacle to the benchmark. A managed vector database whose free tier cannot
+ingest 26k vectors in a day is a different proposition from one that can, and
+this project's corpus is 87 chunks — so the limit is irrelevant to *this* system
+and would be decisive for a larger one.
+
+The sweep now checks its own write budget before starting. A benchmark that runs
+out of budget mid-way does not produce partial results; it produces an index in
+an unknown state.
+
+### Latency is not comparable, and will not be reported as if it were
+
+pgvector's figures come from `EXPLAIN ANALYZE` and exclude the network. Upstash
+exposes no server-side timing, so its figures are client wall-clock including a
+round trip. Measured from the development machine:
+
+| Store | Region | Client p50 | Server p50 |
+|---|---|---|---|
+| Neon Postgres | `ap-southeast-1` | 52.2 ms | **0.06 ms** |
+| Upstash Redis | `ap-south-1` | 106.6 ms | — |
+| Upstash Vector | `eu-west-1` | 519.4 ms | — |
+
+Putting 519 ms beside pgvector's 0.48 ms would repeat exactly the error that made
+this benchmark's first run meaningless, where every configuration read 65–68 ms
+because the network was being measured rather than the query.
+
+**Recall@k and distance ratio remain fully comparable** — no timing is involved —
+and those are what the arm will report when it runs.
+
+### A measurement that was refused rather than published
+
+With the write allowance spent, the index still held 600 vectors from the partial
+run. The obvious salvage was to measure against those, and the script's own
+precondition refused: probing a known vector returned `id=2930` where the
+deterministic corpus predicts `id=7`, so the index contents did not match any
+corpus the benchmark generates.
+
+Measuring against an index of unknown composition produces numbers that look
+exactly like real ones. The arm is deferred instead.
