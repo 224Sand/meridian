@@ -1,0 +1,6 @@
+# ZAP baseline rule overrides. Format: ruleId	action	(comment)
+# WARN rather than FAIL for findings that are informational on a static,
+# unauthenticated marketing surface. Everything security-relevant stays FAIL.
+10015	WARN	(Incomplete or No Cache-control - intentional on streamed routes)
+10063	WARN	(Permissions Policy header - not set; no sensitive browser APIs used)
+10096	WARN	(Timestamp disclosure - build metadata is public by design)

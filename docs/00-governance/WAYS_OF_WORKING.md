@@ -42,7 +42,7 @@ active role is declared in this format:
 | **SDET** | Automated test suites | Unit, integration, contract, e2e tests |
 | **QA Lead** | Test strategy, Definition of Done, defect triage | Test plan, test report, defect log |
 | **DevOps / SRE** | CI/CD, environments, observability, incident response | Pipelines, Dockerfile, runbooks, SLOs |
-| **Security Engineer** | Threat model, secrets policy, abuse controls | Threat model, security review |
+| **Application Security Engineer (AppSec)** | Threat model, SAST, DAST, dependency and secret scanning, supply chain, penetration testing, security release gate | Threat model, security pipelines, SBOM, pen-test findings, security sign-off |
 | **Technical Writer** | User-facing and internal documentation | READMEs, API docs, ADR polish |
 
 **Rule:** a role may not sign off its own work. QA Lead signs off DEV. Architect

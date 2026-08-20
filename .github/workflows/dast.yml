@@ -1,0 +1,58 @@
+name: DAST
+
+# Dynamic scanning against a RUNNING instance. Static analysis reads code;
+# this exercises the deployed surface, which is where authentication, rate
+# limiting, headers and injection handling actually live.
+#
+# Manual and scheduled only. Pointing a scanner at a free-tier instance on
+# every push would exhaust its allowance and prove nothing new.
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Base URL to scan"
+        required: true
+        default: "https://sandscope.vercel.app"
+  schedule:
+    - cron: "0 7 * * 1"
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  zap:
+    name: OWASP ZAP baseline
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Baseline scan
+        uses: zaproxy/action-baseline@v0.14.0
+        with:
+          target: ${{ github.event.inputs.target || 'https://sandscope.vercel.app' }}
+          rules_file_name: .zap/rules.tsv
+          cmd_options: "-a -j"
+          fail_action: false
+
+  headers:
+    name: Security headers
+    runs-on: ubuntu-latest
+    steps:
+      - name: Assert the headers the CSP claims to set
+        run: |
+          TARGET="${{ github.event.inputs.target || 'https://sandscope.vercel.app' }}"
+          echo "scanning $TARGET"
+          HEADERS=$(curl -sS -D - -o /dev/null "$TARGET" || true)
+          echo "$HEADERS"
+          fail=0
+          for header in "content-security-policy" "x-content-type-options" \
+                        "x-frame-options" "referrer-policy" "strict-transport-security"; do
+            if echo "$HEADERS" | grep -qi "^$header:"; then
+              echo "  ok   $header"
+            else
+              echo "  MISS $header"; fail=1
+            fi
+          done
+          # A header the config promises and the response omits is a control
+          # that exists only in the repository.
+          exit $fail

@@ -1,0 +1,116 @@
+name: Security
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Weekly, because a dependency becomes vulnerable without anyone touching
+    # the repository. A scan that only runs on push is a scan that stops running
+    # the moment a project goes quiet.
+    - cron: "0 6 * * 1"
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  codeql:
+    name: CodeQL (SAST)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [python, javascript-typescript]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          queries: security-extended,security-and-quality
+      - uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{ matrix.language }}"
+
+  dependencies:
+    name: Dependency vulnerabilities
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with: { python-version: "3.11" }
+      - name: Install and audit Python dependencies
+        working-directory: apps/agent
+        run: |
+          python -m pip install --upgrade pip pip-audit
+          pip install -e ".[dev]"
+          # Fails the build on a known CVE. A report nobody blocks on is a
+          # report nobody reads.
+          pip-audit --strict --desc
+      - uses: actions/setup-node@v5
+        with: { node-version: "20" }
+      - name: Audit npm dependencies
+        working-directory: apps/web
+        run: npm ci --ignore-scripts && npm audit --audit-level=high
+
+  secrets:
+    name: Secret scanning
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with: { fetch-depth: 0 }
+      - name: gitleaks
+        # A second scanner alongside our own. Ours knows this project's
+        # conventions; gitleaks knows several hundred credential formats this
+        # project has never seen.
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-node@v5
+        with: { node-version: "20" }
+      - name: Project secret gate
+        run: node scripts/check-secrets.mjs
+
+  semgrep:
+    name: Semgrep (SAST)
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep
+    steps:
+      - uses: actions/checkout@v5
+      - name: Scan
+        run: semgrep scan --config=p/default --config=p/security-audit --config=p/secrets --error --skip-unknown-extensions .
+
+  filesystem:
+    name: Trivy (filesystem and IaC)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Scan
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          severity: HIGH,CRITICAL
+          exit-code: "1"
+          ignore-unfixed: true
+          skip-dirs: ".venv,.venv-train,node_modules,apps/agent/sandscope_agent/retrieval/reranker"
+
+  sbom:
+    name: Software bill of materials
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with: { python-version: "3.11" }
+      - name: Generate CycloneDX SBOM
+        working-directory: apps/agent
+        run: |
+          python -m pip install --upgrade pip cyclonedx-bom
+          pip install -e "."
+          cyclonedx-py environment -o ../../sbom-agent.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: sbom-*.json
