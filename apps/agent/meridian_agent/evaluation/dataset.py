@@ -42,6 +42,7 @@ class Mechanism(StrEnum):
 
     SYMPTOM = "symptom_from_fault_signal"
     SECTION = "section_from_runbook_heading"
+    HEADING = "question_from_any_section_heading"
     POLICY = "policy_value_lookup"
     GAP_TOPIC = "topic_absent_from_corpus"
     PROPERTY_TRANSFER = "property_documented_for_another_entity"
@@ -60,6 +61,15 @@ class Question:
     #: The document this example derives from. Splits are made on THIS, so that
     #: two questions sharing a source never straddle train and test.
     group: str
+    #: The exact chunk the answer lives in, where construction determines it.
+    #: Known for section-derived questions, which are generated FROM one chunk.
+    #: Symptom and policy questions are answered by a document rather than by a
+    #: single identifiable passage, so this stays None rather than being guessed.
+    #:
+    #: This exists because measuring at document level hid the real gap:
+    #: retrieval puts the gold DOCUMENT first 98.3% of the time and the gold
+    #: CHUNK first 21.1% of the time, and a citation points at a chunk.
+    gold_chunk_id: str | None = None
 
 
 # ── Answerable: symptom questions from the fault catalogue ──────────────────
@@ -181,6 +191,7 @@ def generate_section_questions(documents: list[Document], chunks: list[Chunk]) -
                     mechanism=Mechanism.SECTION,
                     gold_document_id=chunk.document_id,
                     group=chunk.document_id,
+                    gold_chunk_id=chunk.id,
                 )
             )
     return questions
@@ -223,6 +234,53 @@ _POLICY_QUESTIONS: tuple[tuple[str, str], ...] = (
     ("what evidence must a high risk change proposal state", "pol-change-risk-classification"),
     ("is change risk classified on how confident the author is", "pol-change-risk-classification"),
 )
+
+
+_WH_WORDS = ("why", "what", "when", "how", "who", "where", "which")
+
+
+def _heading_question(heading: str, title: str) -> list[str]:
+    """Turn a section heading into questions it answers by construction.
+
+    The heading is the author's own statement of what the section is about, so
+    a question derived from it is answered by that section and by no other -
+    which is exactly the ground truth a chunk-level metric needs.
+    """
+    lowered = heading.strip().lower()
+    if lowered.startswith(_WH_WORDS):
+        return [lowered, f"{lowered}, for {title.lower()}"]
+    plural = lowered.split()[-1].endswith("s") and not lowered.endswith("ss")
+    verb = "are" if plural else "is"
+    return [f"what {verb} the {lowered}", f"explain the {lowered} for {title.lower()}"]
+
+
+def generate_heading_questions(documents: list[Document], chunks: list[Chunk]) -> list[Question]:
+    """One or two questions per headed chunk, covering the whole corpus.
+
+    `generate_section_questions` only covers headings that appear in the
+    template table, which reached 53 of 87 chunks. That left the chunk-level
+    evaluation with 19 held-out examples - a smoke test rather than a result by
+    this project's own standard. This covers every chunk that has a heading.
+    """
+    titles = {d.id: d.title for d in documents}
+    questions: list[Question] = []
+    for chunk in chunks:
+        if chunk.heading is None:
+            continue
+        title = titles.get(chunk.document_id, chunk.document_id)
+        for index, text in enumerate(_heading_question(chunk.heading, title)):
+            questions.append(
+                Question(
+                    id=f"q-head-{chunk.id}-{index}",
+                    text=text,
+                    label=Label.ANSWERABLE,
+                    mechanism=Mechanism.HEADING,
+                    gold_document_id=chunk.document_id,
+                    group=chunk.document_id,
+                    gold_chunk_id=chunk.id,
+                )
+            )
+    return questions
 
 
 def generate_policy_questions() -> list[Question]:
@@ -516,6 +574,7 @@ def build_questions(
     questions = [
         *generate_symptom_questions(),
         *generate_section_questions(documents, chunks),
+        *generate_heading_questions(documents, chunks),
         *generate_policy_questions(),
         *generate_gap_questions(chunks),
         *generate_property_transfer_questions(chunks),

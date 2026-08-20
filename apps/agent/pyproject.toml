@@ -15,6 +15,9 @@ dependencies = [
   # decision exists.
   "onnxruntime>=1.20",
   "numpy>=2.1",
+  # The Rust tokenizer core on its own, ~3MB. `transformers` would pull torch
+  # and cost ~1GB to do the same job at inference time (ADR-0009).
+  "tokenizers>=0.20",
 ]
 
 [project.optional-dependencies]
@@ -33,6 +36,10 @@ ml = [
   "scipy>=1.14",
   "scikit-learn>=1.5",
   "skl2onnx>=1.17",
+  # Training only. ADR-0009 keeps these out of the runtime: torch alone is
+  # ~1GB installed, against the ~50MB onnxruntime costs to serve what it trains.
+  "torch>=2.5",
+  "transformers>=4.45",
 ]
 
 [build-system]
@@ -72,6 +79,8 @@ ignore = ["E501"]
 # request-facing, and every VALUE in those statements is still parameterised.
 # S311: benchmark vectors must be reproducible from a seed.
 "training/benchmark_ann.py" = ["S608", "S311"]
+# S311: negative sampling and shuffling must be reproducible from a seed.
+"training/train_reranker.py" = ["S311"]
 
 [tool.mypy]
 python_version = "3.11"

@@ -42,3 +42,6 @@ Thumbs.db
 coverage/
 .coverage
 htmlcov/
+
+# Training venv, isolated from the serving environment (ADR-0009).
+.venv-train/

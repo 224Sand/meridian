@@ -8,7 +8,9 @@ meridian_agent.egg-info/top_level.txt
 meridian_agent/db/__init__.py
 meridian_agent/db/engine.py
 meridian_agent/db/migrations.py
+meridian_agent/db/seed_loader.py
 meridian_agent/evaluation/__init__.py
+meridian_agent/evaluation/classifier.py
 meridian_agent/evaluation/dataset.py
 meridian_agent/evaluation/features.py
 meridian_agent/evaluation/statistics.py
@@ -19,6 +21,7 @@ meridian_agent/retrieval/corpus.py
 meridian_agent/retrieval/embedding.py
 meridian_agent/retrieval/evidence.py
 meridian_agent/retrieval/hybrid.py
+meridian_agent/retrieval/reranker.py
 meridian_agent/retrieval/tokenize.py
 meridian_agent/router/__init__.py
 meridian_agent/router/adapters.py
@@ -33,6 +36,7 @@ meridian_agent/seed/incidents.py
 meridian_agent/telemetry/__init__.py
 tests/test_adapters.py
 tests/test_cache.py
+tests/test_classifier.py
 tests/test_dataset.py
 tests/test_estate.py
 tests/test_evidence.py
@@ -41,4 +45,5 @@ tests/test_migrations.py
 tests/test_retrieval.py
 tests/test_router.py
 tests/test_schema_integration.py
+tests/test_seed_loader.py
 tests/test_statistics.py

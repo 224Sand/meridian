@@ -1,0 +1,41 @@
+{
+  "base_model": "cross-encoder/ms-marco-TinyBERT-L-2-v2",
+  "training_pairs": 1939,
+  "held_out_documents": 12,
+  "document_level": {
+    "hybrid": {
+      "hit@1": 0.9714285714285714,
+      "hit@3": 1.0,
+      "mrr": 0.9857142857142858,
+      "n": 70.0
+    },
+    "reranked": {
+      "hit@1": 0.9571428571428572,
+      "hit@3": 1.0,
+      "mrr": 0.9785714285714285,
+      "n": 70.0
+    }
+  },
+  "chunk_level": {
+    "hybrid": {
+      "hit@1": 0.3333333333333333,
+      "hit@3": 0.6666666666666666,
+      "mrr": 0.527962962962963,
+      "n": 30.0
+    },
+    "pretrained_reranked": {
+      "hit@1": 0.36666666666666664,
+      "hit@3": 0.7,
+      "mrr": 0.5608080808080808,
+      "n": 30.0
+    },
+    "finetuned_reranked": {
+      "hit@1": 0.4,
+      "hit@3": 0.7333333333333333,
+      "mrr": 0.5872222222222222,
+      "n": 30.0
+    }
+  },
+  "rerank_latency_p50_ms": 18.5,
+  "candidates": 20
+}
