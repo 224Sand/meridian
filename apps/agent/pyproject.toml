@@ -18,6 +18,7 @@ dependencies = [
   # The Rust tokenizer core on its own, ~3MB. `transformers` would pull torch
   # and cost ~1GB to do the same job at inference time (ADR-0009).
   "tokenizers>=0.20",
+  "langgraph>=0.2",
 ]
 
 [project.optional-dependencies]
