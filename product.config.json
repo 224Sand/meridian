@@ -1,13 +1,13 @@
 {
   "$schema": "./schemas/product.config.schema.json",
-  "name": "MERIDIAN",
-  "slug": "meridian",
-  "wordmark": "MERIDIAN",
+  "name": "SandScope",
+  "slug": "sandscope",
+  "wordmark": "SANDSCOPE",
   "tagline": "The control plane for AI agents that operate production systems.",
   "description": "Every agent action routed deterministically, cached semantically, grounded with citations, evaluated, traced, priced, and gated on human approval.",
-  "repo": "224Sand/meridian",
-  "primaryDomain": "meridian.vercel.app",
-  "agentServiceUrl": "https://224Sand-meridian-agent.hf.space",
-  "provisional": true,
+  "repo": "224Sand/sandscope",
+  "primaryDomain": "sandscope.vercel.app",
+  "agentServiceUrl": "https://224Sand-sandscope-agent.hf.space",
+  "provisional": false,
   "_note": "FR-001 / ADR-0002. This file is the ONLY place the product name is authored. Nothing else may hardcode it. Rename with: npm run rename -- <NEW_NAME>"
 }

@@ -38,7 +38,7 @@ load_dotenv(Path(__file__).resolve().parents[3] / ".env")
 
 REPORT = (
     Path(__file__).resolve().parents[1]
-    / "meridian_agent"
+    / "sandscope_agent"
     / "evaluation"
     / "vector_store_benchmark.json"
 )

@@ -17,7 +17,7 @@ import random
 
 import pytest
 
-from meridian_agent.evaluation.statistics import (
+from sandscope_agent.evaluation.statistics import (
     Interval,
     _normal_quantile,
     bootstrap_interval,
@@ -242,7 +242,7 @@ class TestNoRuntimeDependencies:
         pull a training framework in behind it."""
         import inspect
 
-        from meridian_agent.evaluation import statistics
+        from sandscope_agent.evaluation import statistics
 
         source = inspect.getsource(statistics)
         for forbidden in ("import numpy", "import scipy", "import sklearn", "import torch"):

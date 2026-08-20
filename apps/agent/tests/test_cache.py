@@ -9,14 +9,14 @@ from __future__ import annotations
 
 import pytest
 
-from meridian_agent.retrieval.embedding import DIM, HashingEmbedder, cosine
-from meridian_agent.router.cache import (
+from sandscope_agent.retrieval.embedding import DIM, HashingEmbedder, cosine
+from sandscope_agent.router.cache import (
     InMemoryCacheStore,
     SemanticCache,
     normalise,
     prompt_hash,
 )
-from meridian_agent.router.providers import Message
+from sandscope_agent.router.providers import Message
 
 PARAPHRASE_PAIRS = [
     (
@@ -77,7 +77,7 @@ class TestThreshold:
 
     def test_there_is_no_module_level_threshold_constant(self) -> None:
         """ADR-0008: a shared constant is wrong for any embedder but one."""
-        import meridian_agent.router.cache as cache_module
+        import sandscope_agent.router.cache as cache_module
 
         assert not hasattr(cache_module, "SIMILARITY_THRESHOLD")
 

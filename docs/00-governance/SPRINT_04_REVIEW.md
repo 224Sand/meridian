@@ -103,7 +103,7 @@ is the only place that path is exercised.
 
 The guard did its job in both directions: it prevented an accidental wipe of the
 live database, and reproducing the bug deliberately required setting
-`MERIDIAN_ALLOW_DESTRUCTIVE_TESTS=1` on purpose.
+`SandScope_ALLOW_DESTRUCTIVE_TESTS=1` on purpose.
 
 **What did not.** A test failed during the sprint because the evidence gate
 correctly refused a weak query, and the first instinct was to read it as a bug in

@@ -13,7 +13,7 @@ import os
 import subprocess
 import sys
 
-from meridian_agent.evaluation.harness import run_core, run_probe, write_report
+from sandscope_agent.evaluation.harness import run_core, run_probe, write_report
 
 
 def git_sha() -> str:

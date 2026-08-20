@@ -17,30 +17,30 @@ from __future__ import annotations
 
 import pytest
 
-from meridian_agent.orchestrator.budget import (
+from sandscope_agent.orchestrator.budget import (
     BudgetExhaustedError,
     NoBudgetOpenError,
     SpendGuard,
 )
-from meridian_agent.orchestrator.graph import (
+from sandscope_agent.orchestrator.graph import (
     MAX_VERIFY_ATTEMPTS,
     Dependencies,
     build_graph,
     run,
 )
-from meridian_agent.orchestrator.workloads import (
+from sandscope_agent.orchestrator.workloads import (
     ChangeReview,
     IncidentTriage,
     RiskLevel,
     WorkloadInput,
     get_workload,
 )
-from meridian_agent.retrieval.corpus import chunk_corpus, load_corpus
-from meridian_agent.retrieval.embedding import HashingEmbedder
-from meridian_agent.retrieval.hybrid import HybridRetriever
-from meridian_agent.router.providers import StubProvider
-from meridian_agent.router.router import Router
-from meridian_agent.router.state import ManualClock, RouterState
+from sandscope_agent.retrieval.corpus import chunk_corpus, load_corpus
+from sandscope_agent.retrieval.embedding import HashingEmbedder
+from sandscope_agent.retrieval.hybrid import HybridRetriever
+from sandscope_agent.router.providers import StubProvider
+from sandscope_agent.router.router import Router
+from sandscope_agent.router.state import ManualClock, RouterState
 
 POOL_INCIDENT = WorkloadInput(
     subject="inc-0001",
@@ -178,13 +178,13 @@ class TestSpendGuard:
         assert deps.guard.ledger[-1].estimated_usd > 0
 
     def test_an_unknown_provider_is_priced_at_the_most_expensive_rate(self) -> None:
-        from meridian_agent.orchestrator.budget import PRICES, price
+        from sandscope_agent.orchestrator.budget import PRICES, price
 
         unknown = price("a-provider-that-does-not-exist", 1_000_000, 1_000_000)
         assert unknown >= max(sum(p) for p in PRICES.values())
 
     def test_a_zero_or_negative_ceiling_is_rejected(self) -> None:
-        from meridian_agent.orchestrator.budget import BudgetError
+        from sandscope_agent.orchestrator.budget import BudgetError
 
         with pytest.raises(BudgetError, match="must be positive"):
             SpendGuard().open(0.0)
@@ -242,7 +242,7 @@ class TestRetryActuallyRetries:
     """
 
     def build(self, responses: list[str]) -> Dependencies:
-        from meridian_agent.router.cache import SemanticCache
+        from sandscope_agent.router.cache import SemanticCache
 
         retriever = HybridRetriever(chunks=chunk_corpus(load_corpus()), embedder=HashingEmbedder())
         retriever.build_vectors()
@@ -287,7 +287,7 @@ class TestRetryActuallyRetries:
 
     def test_the_retry_prompt_names_what_was_uncited(self) -> None:
         """A retry that does not say what was wrong is a re-roll, not a fix."""
-        from meridian_agent.orchestrator.graph import hypothesise
+        from sandscope_agent.orchestrator.graph import hypothesise
 
         deps = self.build(["[1] corrected."])
         retriever = deps.retriever
@@ -372,7 +372,7 @@ class TestRiskScoring:
 class TestDeterministicNodes:
     def test_classify_makes_no_model_call(self) -> None:
         """Principle 3: if a typed rule can decide it, no token is spent."""
-        from meridian_agent.orchestrator.graph import classify
+        from sandscope_agent.orchestrator.graph import classify
 
         deps = make_deps()
         before = len(deps.guard.ledger)

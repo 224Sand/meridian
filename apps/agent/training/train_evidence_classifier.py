@@ -1,7 +1,7 @@
 """Train the evidence-sufficiency classifier (FR-028).
 
 Offline only (ADR-0009). scikit-learn is used here and nowhere in the runtime;
-what ships is a JSON file of coefficients that meridian_agent.evaluation
+what ships is a JSON file of coefficients that sandscope_agent.evaluation
 .classifier evaluates in pure Python.
 
 Cross-validation is GROUPED by source document. Two questions generated from one
@@ -24,20 +24,20 @@ from sklearn.model_selection import GroupKFold, cross_val_predict
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
-from meridian_agent.evaluation.dataset import Label, build_questions
-from meridian_agent.evaluation.features import Features, extract
-from meridian_agent.evaluation.statistics import (
+from sandscope_agent.evaluation.dataset import Label, build_questions
+from sandscope_agent.evaluation.features import Features, extract
+from sandscope_agent.evaluation.statistics import (
     bootstrap_interval,
     mcnemar,
     proportion_interval,
     roc_auc_mann_whitney,
     roc_curve,
 )
-from meridian_agent.retrieval.corpus import chunk_corpus, load_corpus
-from meridian_agent.retrieval.embedding import HashingEmbedder
-from meridian_agent.retrieval.hybrid import HybridRetriever
+from sandscope_agent.retrieval.corpus import chunk_corpus, load_corpus
+from sandscope_agent.retrieval.embedding import HashingEmbedder
+from sandscope_agent.retrieval.hybrid import HybridRetriever
 
-MODEL_DIR = Path(__file__).resolve().parents[1] / "meridian_agent" / "evaluation" / "model"
+MODEL_DIR = Path(__file__).resolve().parents[1] / "sandscope_agent" / "evaluation" / "model"
 ARTIFACT = MODEL_DIR / "evidence_model.json"
 ONNX_ARTIFACT = MODEL_DIR / "evidence_model.onnx"
 PARITY_SAMPLE = MODEL_DIR / "parity_sample.json"

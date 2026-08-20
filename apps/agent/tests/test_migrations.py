@@ -12,7 +12,7 @@ from pathlib import Path
 
 import pytest
 
-from meridian_agent.db.migrations import (
+from sandscope_agent.db.migrations import (
     MigrationError,
     checksum,
     discover,

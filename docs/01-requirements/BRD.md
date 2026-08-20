@@ -1,6 +1,6 @@
 # Business Requirements Document
 
-**Product:** MERIDIAN *(name provisional — ADR-0002)*
+**Product:** SandScope *(name provisional — ADR-0002)*
 **Version:** 1.0 · **Author:** Business Analyst · **Date:** 2026-08-20
 **Status:** DRAFT — awaiting Product Owner sign-off
 
@@ -8,7 +8,7 @@
 
 ## 0. Nature of this document
 
-MERIDIAN is a **demonstration product built to production standards on
+SandScope is a **demonstration product built to production standards on
 synthetic data**. The engineering is real: the services, the failover, the
 retrieval, the evaluation, the tests, the pipeline and the deployment all
 function. The *customers* are simulated.

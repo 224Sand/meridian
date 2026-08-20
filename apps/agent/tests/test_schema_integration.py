@@ -20,7 +20,7 @@ import os
 
 import pytest
 
-from meridian_agent.db.engine import apply_migrations, connect
+from sandscope_agent.db.engine import apply_migrations, connect
 
 pytestmark = pytest.mark.integration
 
@@ -54,7 +54,7 @@ def _is_disposable(url: str) -> bool:
     """Whether this target may be dropped.
 
     Matched on the host, not on the database name. A database called
-    `meridian_test` on a managed provider is still somebody's data, and a name
+    `sandscope_test` on a managed provider is still somebody's data, and a name
     is not an authorisation.
     """
     from urllib.parse import urlparse
@@ -69,12 +69,12 @@ def conn():
     if not url:
         pytest.skip("DATABASE_URL not set - integration tests require a live Postgres")
 
-    if not _is_disposable(url) and os.environ.get("MERIDIAN_ALLOW_DESTRUCTIVE_TESTS") != "1":
+    if not _is_disposable(url) and os.environ.get("SANDSCOPE_ALLOW_DESTRUCTIVE_TESTS") != "1":
         from urllib.parse import urlparse
 
         pytest.skip(
             f"refusing to drop the schema on '{urlparse(url).hostname}': not a disposable host. "
-            "Set MERIDIAN_ALLOW_DESTRUCTIVE_TESTS=1 for this command only if you mean it."
+            "Set SANDSCOPE_ALLOW_DESTRUCTIVE_TESTS=1 for this command only if you mean it."
         )
 
     with connect() as c:
@@ -183,7 +183,7 @@ class TestTheGuardItself:
         [
             "postgresql://u:p@localhost:5432/db",
             "postgresql://u:p@127.0.0.1:5432/db",
-            "postgresql://u:p@postgres:5432/meridian_test",
+            "postgresql://u:p@postgres:5432/sandscope_test",
         ],
     )
     def test_disposable_hosts_are_allowed(self, url: str) -> None:
@@ -195,7 +195,7 @@ class TestTheGuardItself:
             "postgresql://u:p@ep-something-pooler.ap-southeast-1.aws.neon.tech/neondb",
             "postgresql://u:p@db.internal.example.com/anything",
             # A database NAMED test on a managed host is still somebody's data.
-            "postgresql://u:p@ep-x.aws.neon.tech/meridian_test",
+            "postgresql://u:p@ep-x.aws.neon.tech/sandscope_test",
         ],
     )
     def test_managed_hosts_are_refused(self, url: str) -> None:

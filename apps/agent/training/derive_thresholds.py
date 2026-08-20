@@ -1,6 +1,6 @@
 """Re-derive the evidence gate's band edges from measurement (FR-027).
 
-Referenced by the constants in meridian_agent/retrieval/evidence.py. Run it
+Referenced by the constants in sandscope_agent/retrieval/evidence.py. Run it
 after any change to retrieval, the embedder, or the corpus - all three move the
 score distribution, and a threshold derived under the old one is a threshold
 chosen by history rather than by evidence.
@@ -15,16 +15,16 @@ still reaches adjudication, so the refusal edge is the more conservative one.
 
 from __future__ import annotations
 
-from meridian_agent.evaluation.dataset import Label, build_questions
-from meridian_agent.evaluation.statistics import (
+from sandscope_agent.evaluation.dataset import Label, build_questions
+from sandscope_agent.evaluation.statistics import (
     bootstrap_interval,
     roc_auc_mann_whitney,
     roc_curve,
 )
-from meridian_agent.retrieval.corpus import chunk_corpus, load_corpus
-from meridian_agent.retrieval.embedding import HashingEmbedder
-from meridian_agent.retrieval.evidence import combined_score
-from meridian_agent.retrieval.hybrid import HybridRetriever
+from sandscope_agent.retrieval.corpus import chunk_corpus, load_corpus
+from sandscope_agent.retrieval.embedding import HashingEmbedder
+from sandscope_agent.retrieval.evidence import combined_score
+from sandscope_agent.retrieval.hybrid import HybridRetriever
 
 FALSE_ANSWER_BUDGET = 0.05
 FALSE_REFUSAL_BUDGET = 0.02
@@ -62,7 +62,7 @@ def main() -> None:
         f" of answerable, {1 - lower.false_positive_rate:.1%} of unanswerable"
     )
 
-    print("\nCopy these into meridian_agent/retrieval/evidence.py. Do not round them")
+    print("\nCopy these into sandscope_agent/retrieval/evidence.py. Do not round them")
     print("toward a nicer number; the budget is the constraint, not the digits.")
 
 

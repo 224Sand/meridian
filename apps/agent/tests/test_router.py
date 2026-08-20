@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import pytest
 
-from meridian_agent.router.providers import (
+from sandscope_agent.router.providers import (
     Message,
     ProviderUnavailableError,
     QuotaExhaustedError,
@@ -19,14 +19,14 @@ from meridian_agent.router.providers import (
     StubProvider,
     TransportError,
 )
-from meridian_agent.router.router import (
+from sandscope_agent.router.router import (
     MAX_CONSECUTIVE_RATE_LIMITS,
     RATE_LIMIT_TTL_SECONDS,
     AllProvidersUnavailableError,
     Router,
     RouterEvent,
 )
-from meridian_agent.router.state import ManualClock, RouterState
+from sandscope_agent.router.state import ManualClock, RouterState
 
 PROMPT = [Message("user", "why is the pool exhausted")]
 

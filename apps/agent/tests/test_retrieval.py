@@ -13,8 +13,8 @@ from pathlib import Path
 
 import pytest
 
-from meridian_agent.retrieval.bm25 import BM25Index
-from meridian_agent.retrieval.corpus import (
+from sandscope_agent.retrieval.bm25 import BM25Index
+from sandscope_agent.retrieval.corpus import (
     CorpusError,
     chunk_corpus,
     chunk_document,
@@ -22,9 +22,9 @@ from meridian_agent.retrieval.corpus import (
     load_document,
     parse_front_matter,
 )
-from meridian_agent.retrieval.embedding import DIM, Embedder, HashingEmbedder, cosine
-from meridian_agent.retrieval.tokenize import tokenize
-from meridian_agent.seed.faults import PATTERNS
+from sandscope_agent.retrieval.embedding import DIM, Embedder, HashingEmbedder, cosine
+from sandscope_agent.retrieval.tokenize import tokenize
+from sandscope_agent.seed.faults import PATTERNS
 
 
 @pytest.fixture(scope="module")
@@ -122,7 +122,7 @@ class TestChunking:
 
     def test_short_sections_merge_backwards(self) -> None:
         """A retrieved chunk must carry evidence, not just a heading."""
-        from meridian_agent.retrieval.corpus import Document
+        from sandscope_agent.retrieval.corpus import Document
 
         document = Document(
             id="d",
@@ -220,7 +220,7 @@ class TestHashingEmbedder:
         """Built-in hash() is salted per process; a store written by one worker
         and queried by another would return nonsense."""
         script = (
-            "from meridian_agent.retrieval.embedding import HashingEmbedder;"
+            "from sandscope_agent.retrieval.embedding import HashingEmbedder;"
             "print(round(sum(HashingEmbedder().embed(['pool exhaustion'])[0][:32]), 9))"
         )
         results = {

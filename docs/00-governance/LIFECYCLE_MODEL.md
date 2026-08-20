@@ -135,7 +135,7 @@ Every role announcement carries the position of the work:
 ▸ ROLE:   Software Engineer (DEV)
 ▸ TASK:   S2-03 — Semantic cache
 ▸ STAGE:  MVP · SDLC Implementation · PDLC Development · AIDLC-7 Serving · Sprint 2
-▸ OUTPUT: meridian_agent/router/cache.py
+▸ OUTPUT: sandscope_agent/router/cache.py
 ▸ GATE:   QA Lead review
 ```
 

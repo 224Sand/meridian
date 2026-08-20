@@ -12,7 +12,7 @@ import json
 
 import pytest
 
-from meridian_agent.evaluation.harness import (
+from sandscope_agent.evaluation.harness import (
     FALSE_ANSWER_BUDGET,
     Check,
     SuiteResult,
@@ -53,7 +53,7 @@ class TestCoreSuite:
         the system is inside budget."""
         import inspect
 
-        from meridian_agent.evaluation import harness
+        from sandscope_agent.evaluation import harness
 
         source = inspect.getsource(harness.run_core)
         assert "rate.high" in source, "the false-answer check must assert the upper bound"
@@ -122,7 +122,7 @@ class TestNoLiveModelCalls:
         import ast
         import inspect
 
-        from meridian_agent.evaluation import harness
+        from sandscope_agent.evaluation import harness
 
         tree = ast.parse(inspect.getsource(harness))
         imported: set[str] = set()

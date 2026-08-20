@@ -33,7 +33,7 @@ to a story and a named test, and mapped to a sprint.
 
 - `check-docs.mjs` was written **before** the documents it governs and observed
   failing with 22 errors. It now passes with 52 requirements traced.
-- `rename.mjs` was executed against a live copy: `MERIDIAN → VANTAGE → MERIDIAN`,
+- `rename.mjs` was executed against a live copy: `SandScope → VANTAGE → SandScope`,
   with schema validation passing at each step.
 - `check-secrets.mjs` scans its own tree; it is constructed so that it cannot
   match its own source, because a gate that trips on itself teaches people to

@@ -19,16 +19,16 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from meridian_agent.orchestrator.budget import BudgetError, NoBudgetOpenError, SpendGuard
-from meridian_agent.orchestrator.graph import Dependencies, run
-from meridian_agent.orchestrator.workloads import WorkloadInput
-from meridian_agent.retrieval.corpus import chunk_corpus, load_corpus
-from meridian_agent.retrieval.embedding import HashingEmbedder
-from meridian_agent.retrieval.hybrid import HybridRetriever
-from meridian_agent.router.cache import SemanticCache
-from meridian_agent.router.providers import StubProvider
-from meridian_agent.router.router import Router
-from meridian_agent.router.state import ManualClock, RouterState
+from sandscope_agent.orchestrator.budget import BudgetError, NoBudgetOpenError, SpendGuard
+from sandscope_agent.orchestrator.graph import Dependencies, run
+from sandscope_agent.orchestrator.workloads import WorkloadInput
+from sandscope_agent.retrieval.corpus import chunk_corpus, load_corpus
+from sandscope_agent.retrieval.embedding import HashingEmbedder
+from sandscope_agent.retrieval.hybrid import HybridRetriever
+from sandscope_agent.router.cache import SemanticCache
+from sandscope_agent.router.providers import StubProvider
+from sandscope_agent.router.router import Router
+from sandscope_agent.router.state import ManualClock, RouterState
 
 POOL_BODY = "db.pool.wait_ms is climbing on orders-db and available connections reached zero"
 

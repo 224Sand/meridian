@@ -11,13 +11,13 @@ from __future__ import annotations
 import httpx
 import pytest
 
-from meridian_agent.router.adapters import (
+from sandscope_agent.router.adapters import (
     OPENAI_COMPATIBLE,
     GeminiProvider,
     OpenAICompatibleProvider,
     _classify,
 )
-from meridian_agent.router.providers import (
+from sandscope_agent.router.providers import (
     Message,
     ProviderUnavailableError,
     QuotaExhaustedError,

@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import pytest
 
-from meridian_agent.evaluation.dataset import (
+from sandscope_agent.evaluation.dataset import (
     MAX_MECHANISM_SHARE,
     Label,
     Mechanism,
@@ -19,7 +19,7 @@ from meridian_agent.evaluation.dataset import (
     cap_mechanisms,
     split_by_group,
 )
-from meridian_agent.retrieval.corpus import chunk_corpus, load_corpus
+from sandscope_agent.retrieval.corpus import chunk_corpus, load_corpus
 
 
 @pytest.fixture(scope="module")
@@ -52,7 +52,7 @@ class TestLabelsAreTrueByConstruction:
         """A model call cannot happen from a module that cannot reach one."""
         import inspect
 
-        from meridian_agent.evaluation import dataset
+        from sandscope_agent.evaluation import dataset
 
         source = inspect.getsource(dataset)
         for forbidden in ("router", "adapters", "chat", "complete("):
@@ -81,7 +81,7 @@ class TestLabelsAreTrueByConstruction:
         If a topic marked absent is in fact present, the generator must drop the
         example rather than ship a label that is no longer true.
         """
-        from meridian_agent.evaluation.dataset import _GAP_QUESTIONS, generate_gap_questions
+        from sandscope_agent.evaluation.dataset import _GAP_QUESTIONS, generate_gap_questions
 
         chunks = chunk_corpus(load_corpus())
         produced = {q.text for q in generate_gap_questions(chunks)}
@@ -124,7 +124,7 @@ class TestComposition:
         assert len({q.id for q in questions}) == len(questions)
 
     def test_no_duplicate_question_text(self, questions) -> None:
-        from meridian_agent.retrieval.tokenize import tokenize
+        from sandscope_agent.retrieval.tokenize import tokenize
 
         keys = [tuple(tokenize(q.text)) for q in questions]
         assert len(set(keys)) == len(keys)

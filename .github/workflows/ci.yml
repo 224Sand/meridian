@@ -41,13 +41,13 @@ jobs:
       postgres:
         image: pgvector/pgvector:pg16
         env:
-          POSTGRES_USER: meridian
-          POSTGRES_PASSWORD: meridian
-          POSTGRES_DB: meridian_test
+          POSTGRES_USER: sandscope
+          POSTGRES_PASSWORD: sandscope
+          POSTGRES_DB: sandscope_test
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U meridian"
+          --health-cmd "pg_isready -U sandscope"
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
@@ -72,7 +72,7 @@ jobs:
         run: ruff format --check .
 
       - name: Type check
-        run: mypy meridian_agent
+        run: mypy sandscope_agent
 
       - name: Offline test suite
         # Must pass with no DATABASE_URL at all: the offline suite is what runs
@@ -86,7 +86,7 @@ jobs:
 
       - name: Integration test suite
         env:
-          DATABASE_URL: postgresql://meridian:meridian@localhost:5432/meridian_test
+          DATABASE_URL: postgresql://sandscope:sandscope@localhost:5432/sandscope_test
         run: pytest -q -m integration
 
       - name: Smoke test the assembled system

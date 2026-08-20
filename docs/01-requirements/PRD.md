@@ -1,6 +1,6 @@
 # Product Requirements Document
 
-**Product:** MERIDIAN *(name provisional — ADR-0002)*
+**Product:** SandScope *(name provisional — ADR-0002)*
 **Version:** 1.0 · **Author:** Product Manager · **Date:** 2026-08-20
 **Status:** DRAFT — awaiting Product Owner sign-off
 **Upstream:** [BRD.md](./BRD.md)
@@ -12,7 +12,7 @@
 > **The control plane for AI agents that operate production systems.**
 
 An agent that touches production must be as accountable as the humans who do.
-MERIDIAN is the layer that makes it so: every action routed deterministically,
+SandScope is the layer that makes it so: every action routed deterministically,
 cached semantically, grounded with citations, evaluated against a fixed set,
 traced end to end, priced per call, and gated on human approval when it crosses
 a risk line.
@@ -27,10 +27,10 @@ asked most urgently and answered worst.
 |---|---|
 | **For** | Platform and SRE teams putting LLM agents into production operations |
 | **Who** | Cannot get production sign-off because agent behaviour is unaccountable |
-| **MERIDIAN is** | An agent control plane |
+| **SandScope is** | An agent control plane |
 | **That** | Makes grounding, cost, safety and behaviour observable and enforceable |
 | **Unlike** | Prompt-level observability tools that record what happened after the fact |
-| **MERIDIAN** | Enforces the constraints at execution time, then proves it did |
+| **SandScope** | Enforces the constraints at execution time, then proves it did |
 
 ## 3. Product principles
 

@@ -35,10 +35,10 @@ import torch
 from torch.utils.data import DataLoader, Dataset
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-from meridian_agent.evaluation.dataset import Label, build_dataset
-from meridian_agent.retrieval.corpus import chunk_corpus, load_corpus
-from meridian_agent.retrieval.embedding import HashingEmbedder
-from meridian_agent.retrieval.hybrid import HybridRetriever
+from sandscope_agent.evaluation.dataset import Label, build_dataset
+from sandscope_agent.retrieval.corpus import chunk_corpus, load_corpus
+from sandscope_agent.retrieval.embedding import HashingEmbedder
+from sandscope_agent.retrieval.hybrid import HybridRetriever
 
 #: TinyBERT rather than MiniLM-L-6. The MiniLM checkpoint loads with no NaN in
 #: any parameter and then produces NaN logits on a plain forward pass on this
@@ -50,7 +50,7 @@ from meridian_agent.retrieval.hybrid import HybridRetriever
 #: It is also the better serving choice: 2 layers against 6, roughly 3x faster
 #: on the 2 vCPU the container has.
 BASE_MODEL = "cross-encoder/ms-marco-TinyBERT-L-2-v2"
-MODEL_DIR = Path(__file__).resolve().parents[1] / "meridian_agent" / "retrieval" / "reranker"
+MODEL_DIR = Path(__file__).resolve().parents[1] / "sandscope_agent" / "retrieval" / "reranker"
 MAX_LENGTH = 256
 CANDIDATES = 20
 NEGATIVES_PER_QUESTION = 4

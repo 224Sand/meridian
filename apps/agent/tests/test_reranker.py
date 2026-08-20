@@ -12,7 +12,7 @@ import math
 
 import pytest
 
-from meridian_agent.retrieval import reranker
+from sandscope_agent.retrieval import reranker
 
 pytestmark = pytest.mark.skipif(
     not reranker.is_available(), reason="trained artefact absent; run training/train_reranker.py"

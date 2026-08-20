@@ -1,5 +1,5 @@
 [project]
-name = "meridian-agent"
+name = "sandscope-agent"
 version = "0.1.0"
 description = "Agent runtime: deterministic routing, semantic cache, grounded retrieval, governed orchestration."
 requires-python = ">=3.11"
@@ -30,7 +30,7 @@ dev = [
 ]
 # Training and reference-implementation dependencies. NOT runtime dependencies
 # (ADR-0009): models are trained offline and served without their framework, and
-# meridian_agent.evaluation.statistics is written against the standard library
+# sandscope_agent.evaluation.statistics is written against the standard library
 # so the shipped code carries none of this. These exist so tests can check that
 # hand-written statistics agree with the reference implementations.
 ml = [
@@ -48,7 +48,7 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-include = ["meridian_agent*"]
+include = ["sandscope_agent*"]
 
 [tool.ruff]
 line-length = 100
@@ -70,11 +70,11 @@ ignore = ["E501"]
 # SAME incident from the same seed, which is exactly what a seeded Mersenne
 # Twister gives and what a CSPRNG deliberately does not. Nothing in this package
 # generates a secret. Scoped to seed/ so the rule still applies everywhere else.
-"meridian_agent/seed/*" = ["S311"]
+"sandscope_agent/seed/*" = ["S311"]
 # Same reasoning for the evaluation package: a train/test split must be
 # reproducible from its seed, which is precisely what a CSPRNG refuses to be.
 # No secret is generated here either.
-"meridian_agent/evaluation/*" = ["S311"]
+"sandscope_agent/evaluation/*" = ["S311"]
 # S608 flags the interpolated table name in the ANN benchmark. TABLE is a module
 # constant that is never derived from input, the script is offline and not
 # request-facing, and every VALUE in those statements is still parameterised.

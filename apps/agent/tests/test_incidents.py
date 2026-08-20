@@ -11,9 +11,9 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 
-from meridian_agent.seed import estate
-from meridian_agent.seed.faults import PATTERNS, Signal, pattern_by_id
-from meridian_agent.seed.incidents import (
+from sandscope_agent.seed import estate
+from sandscope_agent.seed.faults import PATTERNS, Signal, pattern_by_id
+from sandscope_agent.seed.incidents import (
     BASELINE_WINDOW,
     FAULT_WINDOW,
     generate_incident,
@@ -47,7 +47,7 @@ class TestDeterminism:
 
         script = (
             "from datetime import datetime, timezone;"
-            "from meridian_agent.seed.incidents import generate_incident, generate_telemetry;"
+            "from sandscope_agent.seed.incidents import generate_incident, generate_telemetry;"
             "i=generate_incident(7, datetime(2026,8,20,14,0,tzinfo=timezone.utc));"
             "t=generate_telemetry(i);"
             "print(round(sum(p.value for p in t), 6))"

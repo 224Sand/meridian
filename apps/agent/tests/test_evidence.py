@@ -12,16 +12,16 @@ from __future__ import annotations
 
 import pytest
 
-from meridian_agent.evaluation.dataset import build_questions
-from meridian_agent.retrieval.corpus import chunk_corpus, load_corpus
-from meridian_agent.retrieval.embedding import HashingEmbedder
-from meridian_agent.retrieval.evidence import (
+from sandscope_agent.evaluation.dataset import build_questions
+from sandscope_agent.retrieval.corpus import chunk_corpus, load_corpus
+from sandscope_agent.retrieval.embedding import HashingEmbedder
+from sandscope_agent.retrieval.evidence import (
     EvidenceVerdict,
     assess,
     combined_score,
     term_coverage,
 )
-from meridian_agent.retrieval.hybrid import HybridRetriever
+from sandscope_agent.retrieval.hybrid import HybridRetriever
 
 ANSWERABLE = [
     "db.pool.wait_ms is climbing and available connections hit zero",
@@ -180,7 +180,7 @@ class TestBands:
     def test_empty_retrieval_is_insufficient_not_ambiguous(
         self, retriever: HybridRetriever
     ) -> None:
-        from meridian_agent.retrieval.hybrid import RetrievalResult
+        from sandscope_agent.retrieval.hybrid import RetrievalResult
 
         empty = RetrievalResult(query="q", hits=(), degraded=False)
         assert assess("q", empty).verdict is EvidenceVerdict.INSUFFICIENT
@@ -208,8 +208,8 @@ class TestValueDemandingQuestions:
         SUFFICIENT_ABOVE for an unrelated reason, so asserting the mechanism
         through them would silently stop testing it.
         """
-        from meridian_agent.retrieval.corpus import Chunk
-        from meridian_agent.retrieval.hybrid import RetrievalResult, Retrieved
+        from sandscope_agent.retrieval.corpus import Chunk
+        from sandscope_agent.retrieval.hybrid import RetrievalResult, Retrieved
 
         chunk = Chunk(
             id="c1",
@@ -235,8 +235,8 @@ class TestValueDemandingQuestions:
         assert "states no value" in assessment.rationale
 
     def test_the_downgrade_does_not_fire_when_a_value_is_present(self) -> None:
-        from meridian_agent.retrieval.corpus import Chunk
-        from meridian_agent.retrieval.hybrid import RetrievalResult, Retrieved
+        from sandscope_agent.retrieval.corpus import Chunk
+        from sandscope_agent.retrieval.hybrid import RetrievalResult, Retrieved
 
         chunk = Chunk(
             id="c2",
@@ -257,7 +257,7 @@ class TestValueDemandingQuestions:
     def test_tier_and_severity_labels_do_not_count_as_values(self) -> None:
         """The first version of this check was a bare digit match, which treated
         'Tier 0' as a stated quantity and therefore caught nothing."""
-        from meridian_agent.retrieval.evidence import _CONTAINS_A_VALUE
+        from sandscope_agent.retrieval.evidence import _CONTAINS_A_VALUE
 
         assert not _CONTAINS_A_VALUE.search("Tier 0 and Tier 1 roll out by region")
         assert not _CONTAINS_A_VALUE.search("roughly one percent of its volume")
@@ -265,7 +265,7 @@ class TestValueDemandingQuestions:
         assert _CONTAINS_A_VALUE.search("sessions idle beyond 60 seconds")
 
     def test_non_value_questions_are_not_affected(self) -> None:
-        from meridian_agent.retrieval.evidence import _DEMANDS_A_VALUE
+        from sandscope_agent.retrieval.evidence import _DEMANDS_A_VALUE
 
         assert not _DEMANDS_A_VALUE.search("should I roll back before diagnosing")
         assert not _DEMANDS_A_VALUE.search("what risk level is a pool ceiling change")
@@ -281,8 +281,8 @@ class TestAtScale:
     """
 
     def test_false_answer_rate_stays_within_budget(self) -> None:
-        from meridian_agent.evaluation.dataset import Label
-        from meridian_agent.evaluation.statistics import proportion_interval
+        from sandscope_agent.evaluation.dataset import Label
+        from sandscope_agent.evaluation.statistics import proportion_interval
 
         retriever = HybridRetriever(chunks=chunk_corpus(load_corpus()), embedder=HashingEmbedder())
         retriever.build_vectors()
@@ -301,7 +301,7 @@ class TestAtScale:
 
     def test_answerable_questions_are_not_all_refused(self) -> None:
         """Over-refusal is the safe direction, not a free one."""
-        from meridian_agent.evaluation.dataset import Label
+        from sandscope_agent.evaluation.dataset import Label
 
         retriever = HybridRetriever(chunks=chunk_corpus(load_corpus()), embedder=HashingEmbedder())
         retriever.build_vectors()

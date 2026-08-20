@@ -1,6 +1,6 @@
 # Ways of Working — Project Charter
 
-**Project codename:** MERIDIAN *(provisional — see ADR-0002, rename is a single command)*
+**Project codename:** SandScope *(provisional — see ADR-0002, rename is a single command)*
 **Charter version:** 1.0 (SIGNED OFF 2026-08-20)
 **Author:** Technical Program Manager
 **Date:** 2026-08-20

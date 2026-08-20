@@ -15,7 +15,7 @@ import json
 
 import pytest
 
-from meridian_agent.evaluation.classifier import (
+from sandscope_agent.evaluation.classifier import (
     METADATA_PATH,
     ONNX_PATH,
     Features,
@@ -197,7 +197,7 @@ class TestNoTrainingFrameworkAtRuntime:
         import ast
         import inspect
 
-        from meridian_agent.evaluation import classifier
+        from sandscope_agent.evaluation import classifier
 
         tree = ast.parse(inspect.getsource(classifier))
         imported: set[str] = set()
@@ -218,7 +218,7 @@ class TestNoTrainingFrameworkAtRuntime:
     def test_a_missing_artefact_raises_rather_than_degrading_silently(self, tmp_path) -> None:
         """Falling back to the heuristic without saying so would be the worst
         available behaviour: its measured false-answer rate is 56.6%."""
-        import meridian_agent.evaluation.classifier as module
+        import sandscope_agent.evaluation.classifier as module
 
         original = module.METADATA_PATH
         module.load_metadata.cache_clear()

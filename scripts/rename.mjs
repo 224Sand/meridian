@@ -83,7 +83,10 @@ if (applyRemote) {
   console.log(`    npm run rename -- ${newName} --apply-remote`);
 }
 
-console.log(`\n  Remaining manual steps (they live outside this repo):`);
+console.log(`\n  Remaining manual steps:`);
+console.log(`    · Python package: apps/agent/<slug>_agent is an IMPORT PATH, not`);
+console.log(`      the product name, and this tool does not touch it. Renaming it`);
+console.log(`      is a refactor across every import (ADR-0002 addendum).`);
 console.log(`    · Hugging Face Space: rename in Space settings to ${newSlug}-agent`);
 console.log(`    · Vercel project: rename in project settings to ${newSlug}`);
 console.log(`    · Local directory: mv ${root} ${resolve(root, "..", newSlug)}`);

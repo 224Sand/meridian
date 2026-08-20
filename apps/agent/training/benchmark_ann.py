@@ -45,7 +45,7 @@ import numpy as np
 import psycopg
 from dotenv import load_dotenv
 
-from meridian_agent.db.engine import connect
+from sandscope_agent.db.engine import connect
 
 load_dotenv(Path(__file__).resolve().parents[3] / ".env")
 
@@ -58,7 +58,7 @@ TOP_K = 10
 CLUSTERS = 400
 TABLE = "ann_bench_vectors"
 REPORT = (
-    Path(__file__).resolve().parents[1] / "meridian_agent" / "evaluation" / "ann_benchmark.json"
+    Path(__file__).resolve().parents[1] / "sandscope_agent" / "evaluation" / "ann_benchmark.json"
 )
 
 

@@ -1,4 +1,4 @@
--- 0001_initial — MERIDIAN control plane schema
+-- 0001_initial — SandScope control plane schema
 --
 -- Forward-only. Migrations are never edited after they have been applied
 -- anywhere; a correction is a new migration.

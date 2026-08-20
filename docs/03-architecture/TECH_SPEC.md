@@ -1,6 +1,6 @@
 # Technical Specification
 
-**Product:** MERIDIAN *(name provisional — ADR-0002)*
+**Product:** SandScope *(name provisional — ADR-0002)*
 **Version:** 1.0 · **Author:** Solutions Architect · **Date:** 2026-08-20
 **Status:** DRAFT — awaiting sign-off
 **Upstream:** [BRD.md](../01-requirements/BRD.md) · [PRD.md](../01-requirements/PRD.md)
@@ -12,14 +12,14 @@
 ```mermaid
 C4Context
   Person(visitor, "Technical reviewer", "Recruiter, hiring manager or engineer")
-  System(meridian, "MERIDIAN", "Agent control plane with an incident-triage workload")
+  System(sandscope, "SandScope", "Agent control plane with an incident-triage workload")
   System_Ext(providers, "LLM providers", "Groq, Gemini, Cerebras, OpenRouter, Mistral")
   System_Ext(github, "GitHub API", "Live CI runs, commits, workflow status")
   System_Ext(pexels, "Pexels", "Source footage, fetched at build time only")
-  Rel(visitor, meridian, "Triages incidents, inspects traces, reviews delivery record")
-  Rel(meridian, providers, "Model calls via deterministic failover")
-  Rel(meridian, github, "Reads real pipeline state")
-  Rel(meridian, pexels, "Build-time asset fetch")
+  Rel(visitor, sandscope, "Triages incidents, inspects traces, reviews delivery record")
+  Rel(sandscope, providers, "Model calls via deterministic failover")
+  Rel(sandscope, github, "Reads real pipeline state")
+  Rel(sandscope, pexels, "Build-time asset fetch")
 ```
 
 **Design consequence of the Pexels edge:** footage is fetched, transcoded and
@@ -94,7 +94,7 @@ process lifetime.
 | Clock | Injected, never `time.time()` directly — otherwise TTL expiry is untestable |
 | State | Explicit `RouterState` object, not module globals — otherwise tests leak into each other |
 | Failure injection | `FailureInjector` interface backing FR-011 |
-| `claude_cli` | Registered, `available=False` when `MERIDIAN_ENV != local`. Surfaced honestly as `UNAVAILABLE — local only` (R-06) |
+| `claude_cli` | Registered, `available=False` when `SandScope_ENV != local`. Surfaced honestly as `UNAVAILABLE — local only` (R-06) |
 
 Derived from the router in `jobagent/utils/llm_router.py`, rewritten async and
 made testable. The original's module-level mutable state and direct clock reads

@@ -9,8 +9,8 @@ from __future__ import annotations
 
 import pytest
 
-from meridian_agent.seed import estate
-from meridian_agent.seed.estate import EstateError, Tier
+from sandscope_agent.seed import estate
+from sandscope_agent.seed.estate import EstateError, Tier
 
 
 class TestInvariants:
@@ -39,7 +39,7 @@ class TestInvariants:
 
     def test_cycle_is_detected(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """The acyclicity check must actually be capable of failing."""
-        from meridian_agent.seed.estate import Dependency
+        from sandscope_agent.seed.estate import Dependency
 
         cyclic = (
             *estate.dependencies(),
@@ -50,7 +50,7 @@ class TestInvariants:
             estate.validate()
 
     def test_dangling_dependency_is_detected(self, monkeypatch: pytest.MonkeyPatch) -> None:
-        from meridian_agent.seed.estate import Dependency
+        from sandscope_agent.seed.estate import Dependency
 
         broken = (*estate.dependencies(), Dependency("svc-edge-gateway", "svc-nope", "sync"))
         monkeypatch.setattr(estate, "_DEPENDENCIES", broken)

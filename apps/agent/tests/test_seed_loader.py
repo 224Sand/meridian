@@ -14,9 +14,9 @@ import os
 
 import pytest
 
-from meridian_agent.db.engine import apply_migrations, connect
-from meridian_agent.db.seed_loader import seed
-from meridian_agent.retrieval.embedding import HashingEmbedder
+from sandscope_agent.db.engine import apply_migrations, connect
+from sandscope_agent.db.seed_loader import seed
+from sandscope_agent.retrieval.embedding import HashingEmbedder
 from tests.test_schema_integration import _is_disposable
 
 pytestmark = pytest.mark.integration
@@ -27,7 +27,7 @@ def conn():
     url = os.environ.get("DATABASE_URL", "")
     if not url:
         pytest.skip("DATABASE_URL not set")
-    if not _is_disposable(url) and os.environ.get("MERIDIAN_ALLOW_DESTRUCTIVE_TESTS") != "1":
+    if not _is_disposable(url) and os.environ.get("SANDSCOPE_ALLOW_DESTRUCTIVE_TESTS") != "1":
         pytest.skip("refusing to seed a non-disposable host")
     with connect() as c:
         with c.cursor() as cur:

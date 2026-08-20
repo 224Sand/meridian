@@ -12,7 +12,7 @@ from collections.abc import Iterator
 import pytest
 from fastapi.testclient import TestClient
 
-from meridian_agent.api.security import TokenNotConfiguredError, expected_token
+from sandscope_agent.api.security import TokenNotConfiguredError, expected_token
 
 TOKEN = "t" * 48
 
@@ -26,11 +26,11 @@ def client(monkeypatch: pytest.MonkeyPatch) -> Iterator[TestClient]:
     code under test.
     """
     monkeypatch.setenv("AGENT_SERVICE_TOKEN", TOKEN)
-    monkeypatch.setenv("MERIDIAN_ENV", "test")
+    monkeypatch.setenv("SANDSCOPE_ENV", "test")
     monkeypatch.setenv("RUN_BUDGET_USD", "0.02")
     import importlib
 
-    from meridian_agent.api import app as module
+    from sandscope_agent.api import app as module
 
     importlib.reload(module)
     with TestClient(module.app) as test_client:
@@ -54,7 +54,7 @@ class TestStartupRefusesBadConfiguration:
         monkeypatch.setenv("RUN_BUDGET_USD", "0")
         import importlib
 
-        from meridian_agent.api import app as module
+        from sandscope_agent.api import app as module
 
         importlib.reload(module)
         with pytest.raises(RuntimeError, match="RUN_BUDGET_USD"), TestClient(module.app):
@@ -65,7 +65,7 @@ class TestStartupRefusesBadConfiguration:
         monkeypatch.setenv("RUN_BUDGET_USD", "-1")
         import importlib
 
-        from meridian_agent.api import app as module
+        from sandscope_agent.api import app as module
 
         importlib.reload(module)
         with pytest.raises(RuntimeError, match="RUN_BUDGET_USD"), TestClient(module.app):
@@ -117,7 +117,7 @@ class TestAuthentication:
         import ast
         import inspect
 
-        from meridian_agent.api import security
+        from sandscope_agent.api import security
 
         tree = ast.parse(inspect.getsource(security))
         assert any(
