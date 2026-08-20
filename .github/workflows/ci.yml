@@ -89,6 +89,12 @@ jobs:
           DATABASE_URL: postgresql://meridian:meridian@localhost:5432/meridian_test
         run: pytest -q -m integration
 
+      - name: Smoke test the assembled system
+        # DoD item 7: demonstrable, not described. Written at Sprint 0 and
+        # enforced zero times until Sprint 5, by which point the first real
+        # execution had found three defects in ten minutes.
+        run: python scripts/smoke.py
+
       - name: Evaluation suites
         # golden/core blocks. golden/probe warns and never blocks: a probe suite
         # that could fail the build would be tuned until it stopped complaining,
