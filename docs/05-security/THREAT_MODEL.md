@@ -70,3 +70,53 @@ message, or included in a trace attribute.
 This model is revisited when: any tool gains write access to an external system;
 user-supplied documents enter the corpus; authentication is added; or a new trust
 boundary appears. Absent those, it is reviewed once at Sprint 6 hardening.
+
+---
+
+# Addendum — Sprint 5: the public browser surface
+
+**Date:** 2026-08-20 · **Trigger:** §6, "a new trust boundary appears"
+
+Sprints 0–4 produced a library. Sprint 5 puts a browser in front of it, which
+adds a boundary that did not exist and changes the exposure of two threats
+already recorded.
+
+## New surface
+
+| | |
+|---|---|
+| Browser → BFF | Fully untrusted. Anyone on the internet. |
+| BFF → agent runtime | Authenticated; the browser must never cross it directly. |
+
+## Threats
+
+| # | Threat | Vector | Mitigation | Residual |
+|---|---|---|---|---|
+| **T-12** | The inter-service token reaches the browser | Passing it to a client component, or into a `NEXT_PUBLIC_*` variable | The token is read only in route handlers, never in a component. A test greps the built client bundle for it and fails the build on a match. | Low |
+| **T-13** | The runtime is called directly, bypassing the BFF's rate limit | The Space URL is discoverable | Bearer auth on every `/v1/*` route (T-3), plus the per-IP limit is the BFF's job and the daily token ceiling is the runtime's, so neither depends on the other | Low |
+| **T-14** | SSE connections held open to exhaust the runtime | Opening many streams and never reading | Per-IP concurrent-stream cap; server-side timeout on any run exceeding its budget. A stream is not free just because it is idle. | Medium |
+| **T-15** | A run's free-text body used to smuggle instructions | Prompt injection through the incident description | Retrieved content and user content are both delimited and neither is granted instruction authority. **No tool can act on any real system** (T-11), so the worst outcome is a wrong answer rather than a wrong action. Body length is capped at 4,000 characters, which is also a cost bound. | Medium — accepted |
+| **T-16** | A secret reaches a trace attribute and is rendered | Span attributes are shown in the UI | The span exporter has an allowlist of attribute keys; anything else is dropped rather than redacted, because a redaction that fails is invisible | Low |
+| **T-17** | Approval forged or replayed | Posting an approval for someone else's run | An approval is bound to the session that created the run; a decision for an unknown or foreign run is rejected. Demo-grade identity, stated as such. | Medium — accepted |
+
+## Two changes to existing entries
+
+**T-1 (unbounded model spend) moves from Low to Medium residual.** It was
+theoretical while nothing was deployed. Once a URL exists it is a matter of
+someone finding it. The mitigations are unchanged and now actually matter: per-IP
+sliding window failing **closed** (ADR-0007), a daily token ceiling, and a spend
+guard that refuses without an open budget.
+
+**T-9 (session correlation from IP) is unchanged and worth restating.** The BFF
+now sees every visitor's address for rate limiting. It is hashed with a salt
+before it reaches storage and the raw value never leaves the request scope.
+
+## The control that carries the most weight
+
+**T-11 — no tool executes against any real system.** Every threat involving
+prompt injection, forged approvals or a compromised model resolves to "the
+attacker obtains a wrong sentence" rather than "the attacker obtains an action".
+
+That is a design decision with a cost: the product proposes and never executes,
+which makes the demonstration less impressive than it could be. It is also why
+this threat model is short.
