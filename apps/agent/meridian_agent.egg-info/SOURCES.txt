@@ -10,6 +10,8 @@ meridian_agent/db/engine.py
 meridian_agent/db/migrations.py
 meridian_agent/evaluation/__init__.py
 meridian_agent/evaluation/dataset.py
+meridian_agent/evaluation/features.py
+meridian_agent/evaluation/statistics.py
 meridian_agent/orchestrator/__init__.py
 meridian_agent/retrieval/__init__.py
 meridian_agent/retrieval/bm25.py
@@ -39,3 +41,4 @@ tests/test_migrations.py
 tests/test_retrieval.py
 tests/test_router.py
 tests/test_schema_integration.py
+tests/test_statistics.py

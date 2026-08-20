@@ -1,0 +1,27 @@
+{
+  "model": "gradient_boosting_uncalibrated",
+  "format": "onnx",
+  "trained_on": 534,
+  "features": [
+    "top_dense",
+    "top_lexical",
+    "combined",
+    "mean_dense_top3",
+    "mean_lexical_top3",
+    "lexical_margin",
+    "dense_margin",
+    "score_entropy",
+    "term_coverage",
+    "demands_value",
+    "value_present",
+    "query_terms"
+  ],
+  "operating_point": {
+    "threshold": 0.993200945942914,
+    "false_answer_budget": 0.05,
+    "recall": 0.3345724907063197,
+    "false_positive_rate": 0.045283018867924525
+  },
+  "cross_validated_auc": 0.7957284141123658,
+  "baseline_auc": 0.6306375815388932
+}
