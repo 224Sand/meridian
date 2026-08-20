@@ -45,3 +45,18 @@ Page Data Platform on-call if the hit ratio has not recovered above 0.70 within
 ## Related
 
 `rb-database-connection-pool` · `pm-2026-06-sessions-cache-flush`
+
+## Common misdiagnosis
+
+**Mistaken for a database capacity problem.** `db.active_connections` does rise,
+so the database looks like the fault. It is downstream of it. The discriminator
+is ordering: the hit ratio falls first, by a minute or more.
+
+**Mistaken for a capacity eviction when it is a namespace change.** Both collapse
+the hit ratio identically. `cache.memory_used_ratio` separates them: at or near
+1.0 it is capacity, well below it the keys became unreachable rather than
+evicted. Reading only the hit ratio graph cannot tell these apart.
+
+**Treated with a restart.** A restart empties the cache again and restarts the
+stampede. This has happened here before and cost seven minutes; see
+`pm-2026-06-sessions-cache-flush`.

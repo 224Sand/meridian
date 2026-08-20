@@ -49,3 +49,17 @@ services are affected or if any Tier 0 service is failing.
 ## Related
 
 `rb-database-connection-pool` · `rb-memory-pressure` · `pol-incident-severity`
+
+## Common misdiagnosis
+
+**The first service to alert is assumed to be the cause.** It is usually the
+furthest upstream, because it is the most customer-facing and therefore the most
+closely watched. Walk downward.
+
+**Simultaneous onset read as a cascade.** In a cascade each hop degrades later
+than the one below it. Services that degrade in the same minute share a
+dependency; they are not causing each other. That points at a datastore.
+
+**Retries increased to improve resilience.** Retries add load to the dependency
+that is already the constraint. Under this fault, more retries degrade the
+system faster.

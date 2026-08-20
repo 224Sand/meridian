@@ -44,3 +44,17 @@ Page Data Platform on-call when lag exceeds 1,000,000 messages or when
 ## Related
 
 `rb-timeout-and-retry` · `pol-data-freshness`
+
+## Common misdiagnosis
+
+**Assumed healthy because nothing is erroring.** Error rate stays flat through
+the entire fault. Any alerting built only on error rate will report a healthy
+system while downstream data goes progressively stale.
+
+**Mistaken for a consumer fault when production rose.** Adding consumers to
+absorb a replay makes the replay finish faster and does nothing about the
+freshness breach. Establish which side moved before responding.
+
+**Scaled past the partition count.** Consumers beyond the partition count sit
+idle. Throughput does not improve, and the extra instances make the next
+rebalance slower.

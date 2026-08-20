@@ -32,11 +32,37 @@ The remaining ambiguity is not tuned away. It is reported.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from enum import StrEnum
 
 from meridian_agent.retrieval.hybrid import RetrievalResult
 from meridian_agent.retrieval.tokenize import tokenize
+
+#: Questions demanding a specific quantity. Retrieval scores cannot detect the
+#: case these create: a corpus that discusses a thing at length without ever
+#: stating its value scores as well as one that states it. "How long is the
+#: observation period between regions" scored 8.85 - comfortably answerable -
+#: against a passage that says an observation period exists and never says how
+#: long it is.
+_DEMANDS_A_VALUE = re.compile(
+    r"\b(how (long|many|much|often|large|big)"
+    r"|what (is|are) the (duration|limit|ceiling|threshold|timeout|slo|sla"
+    r"|target|budget|rate|interval|period|retention|maximum|minimum|size|count))\b",
+    re.IGNORECASE,
+)
+#: A stated quantity: a number carrying a unit, or any multi-digit figure.
+#: A bare single digit does not qualify, because "Tier 0" and "Severity 1" are
+#: labels rather than measurements and are everywhere in this corpus. The first
+#: version of this pattern was a plain \\d and matched every one of them, which
+#: is how it passed while catching nothing.
+_CONTAINS_A_VALUE = re.compile(
+    r"\b\d+(?:\.\d+)?\s*"
+    r"(?:ms|s|sec|secs|seconds?|min|mins|minutes?|hours?|days?|weeks?|months?"
+    r"|%|percent|mb|gb|qps|connections?|instances?|messages?|retries|attempts?)\b"
+    r"|\b\d{2,}\b",
+    re.IGNORECASE,
+)
 
 #: Below this, retrieved material is clearly too weak to answer from. Set from
 #: the measurement above: the strongest unanswerable question scored 2.00 and
@@ -110,6 +136,10 @@ def combined_score(result: RetrievalResult) -> float:
     return result.top_dense * result.top_lexical
 
 
+def _contains_a_value(result: RetrievalResult, depth: int = 2) -> bool:
+    return any(_CONTAINS_A_VALUE.search(hit.chunk.body) for hit in result.hits[:depth])
+
+
 def assess(query: str, result: RetrievalResult) -> EvidenceAssessment:
     dense = result.top_dense
     lexical = result.top_lexical
@@ -161,6 +191,20 @@ def assess(query: str, result: RetrievalResult) -> EvidenceAssessment:
         )
 
     if combined >= SUFFICIENT_ABOVE:
+        if _DEMANDS_A_VALUE.search(query) and not _contains_a_value(result):
+            # Downgraded to AMBIGUOUS, never straight to INSUFFICIENT: this is a
+            # heuristic about the shape of the question, and a heuristic is not
+            # entitled to refuse on its own authority.
+            return EvidenceAssessment(
+                EvidenceVerdict.AMBIGUOUS,
+                combined,
+                dense,
+                lexical,
+                coverage,
+                f"the question asks for a specific value and scores {combined:.2f}, "
+                "but the retrieved material states no value; discussing a quantity "
+                "is not the same as stating it",
+            )
         return EvidenceAssessment(
             EvidenceVerdict.SUFFICIENT,
             combined,

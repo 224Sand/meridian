@@ -20,6 +20,8 @@ bearing, not an oversight.
 | On-call rota, shift handover, compensation | Not authored. |
 | Regional failover and disaster recovery | Estate is single region; no failover document exists. |
 | Kubernetes, service mesh, or scheduler behaviour | No document names the orchestration platform. |
+| Cost of a change, or budget approval for one | Change risk is classified on blast radius only. |
+| Feature flags, experiments, progressive delivery | Rollout is by region; no flag system is described. |
 | Security incident response, breach handling | Out of scope for this corpus. |
 | Why the platform's restart events were not routed to team alerting | Explicitly left open in `pm-2026-07-fraud-scoring-restart-loop`. |
 
@@ -35,6 +37,19 @@ adjacent context.
 | Which team owns `edge-gateway` out of hours? | Ownership is documented; the out-of-hours rota is not. |
 | What is the SLO for checkout availability? | Severity definitions exist. No SLO is stated anywhere. |
 | How long are heap dumps retained? | Capturing a dump is documented. Retention is not. |
+| How long is the observation period between regions? | Its existence and purpose are documented; no duration is stated anywhere. |
+| What is the minimum time between regional rollout steps? | Same gap, asked a second way. |
 
 A system that answers any row in this table has failed, and the failure is
 specifically the one this product exists to prevent.
+
+## A correction, kept visible
+
+"Who approves an emergency change during an incident?" was listed here and
+should not have been. `pol-change-risk-classification` states that emergency
+changes are governed by the incident commander, which answers it. The evidence
+gate scored it answerable, the author had marked it unanswerable, and the author
+was wrong.
+
+It is recorded rather than quietly deleted because a gap list is itself a claim
+about the corpus, and claims in this project are corrected in the open.

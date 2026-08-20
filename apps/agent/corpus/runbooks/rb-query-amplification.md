@@ -43,3 +43,16 @@ exceeds 500 ms, since pool exhaustion will follow.
 ## Related
 
 `rb-database-connection-pool`
+
+## Common misdiagnosis
+
+**Mistaken for pool exhaustion.** Pool wait time rises in both. Here it rises
+*because* query volume rose; there it rises with query volume unchanged. Divide
+query rate by request rate before choosing.
+
+**Mistaken for organic growth.** Amplification appears at an inflection point
+tied to a deploy, not as a gradient. If the change is gradual over weeks, this is
+not the fault.
+
+**Absent from tests.** Cost scales with result size, and test fixtures are
+small. Passing tests are not evidence against this fault.

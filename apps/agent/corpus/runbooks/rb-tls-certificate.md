@@ -48,3 +48,17 @@ regardless of measured traffic impact.
 ## Related
 
 `pol-incident-severity`
+
+## Common misdiagnosis
+
+**Mistaken for a capacity problem.** Capacity degrades along a curve. Expiry is a
+step: total failure within one sample interval. The shape settles it without any
+further investigation.
+
+**Leaf certificate checked, chain ignored.** An expired intermediate produces
+identical handshake failures while `tls.certificate_days_remaining` on the leaf
+stays positive. A positive leaf value does not clear this fault.
+
+**Alerted on the wrong metric.** Alerting on handshake failures means alerting
+after the outage has already happened. The actionable alert is on days
+remaining.

@@ -43,3 +43,17 @@ consumer is affected.
 ## Related
 
 `pol-incident-severity`
+
+## Common misdiagnosis
+
+**Declared healthy from mean latency.** Every query waits for the slowest shard,
+so the tail is set by the largest shard and the mean by the rest. A dashboard
+built on averages shows nothing wrong throughout.
+
+**Mistaken for cluster capacity.** If the mean has also risen it is capacity. If
+only the tail moved it is imbalance. Adding nodes does not redistribute existing
+documents.
+
+**Rebalanced without fixing the routing key.** A low-cardinality routing key
+re-concentrates after every rebalance. Rebalancing buys time and changes
+nothing.

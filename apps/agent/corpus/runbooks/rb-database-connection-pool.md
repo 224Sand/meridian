@@ -47,3 +47,17 @@ Page Data Platform on-call if `db.pool.available` remains at zero for more than
 ## Related
 
 `rb-query-amplification` · `rb-timeout-and-retry` · `pm-2026-05-orders-db-saturation`
+
+## Common misdiagnosis
+
+**Mistaken for a traffic spike.** Request rate is flat in every real instance of
+this fault. If request rate rose, the pool is a symptom of load and the response
+is capacity, not rollback.
+
+**Mistaken for query amplification.** Both raise `db.pool.wait_ms`. The
+discriminator is `db.queries_per_request`: unchanged here, sharply higher there.
+Check it before choosing a response, because the two have opposite remedies.
+
+**Mistaken for a database outage.** The database is healthy throughout. It is
+answering every query it receives; the callers cannot get a connection to send
+one. `db.query.p99_ms` stays normal, which is the tell.

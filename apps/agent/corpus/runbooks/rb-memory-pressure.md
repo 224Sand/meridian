@@ -46,3 +46,17 @@ exceed three in one hour.
 ## Related
 
 `rb-timeout-and-retry` · `pm-2026-07-fraud-scoring-restart-loop`
+
+## Common misdiagnosis
+
+**Not seen at all.** The default four-hour dashboard window is shorter than the
+restart interval, so the graph resets before the trend is visible. Widen to
+seven days or the fault is invisible; this hid a leak for nine days in
+`pm-2026-07-fraud-scoring-restart-loop`.
+
+**Mistaken for a legitimate working-set increase.** A step to a higher flat level
+after a deploy is a larger working set. A sawtooth that climbs and resets is a
+leak. The shape is the discriminator, not the level.
+
+**Treated by raising the memory limit.** This lengthens time-to-restart and
+lengthens pauses. The alert stops firing and the user experience gets worse.
