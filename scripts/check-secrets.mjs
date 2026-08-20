@@ -5,7 +5,16 @@
  * Patterns are assembled from fragments so this file cannot match itself, and
  * the scanner skips its own path as a second guard. A gate that trips on its
  * own source teaches the team to add --no-verify, which defeats the gate.
+ *
+ * For the same reason it scans the set of files that CAN be committed - git's
+ * tracked and untracked-but-not-ignored files - rather than walking the
+ * filesystem. The first version walked the tree and failed on .env, which is
+ * gitignored and therefore uncommittable by construction. A gate that fails on
+ * every machine with a working local environment is a gate everyone learns to
+ * skip, which is precisely the failure this comment block was written to warn
+ * about and did not prevent.
  */
+import { execFileSync } from "node:child_process";
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join, relative, resolve } from "node:path";
@@ -38,6 +47,53 @@ const PLACEHOLDER = /(your[_-]?key|xxx+|placeholder|example|changeme|<[^>]+>|\.\
 
 const findings = [];
 
+/**
+ * Files that could actually reach a commit. `-c` cached (tracked), `-o` other
+ * (untracked), `--exclude-standard` applies .gitignore. Outside a git repo the
+ * directory walk below is the fallback.
+ */
+function committableFiles() {
+  try {
+    return execFileSync("git", ["ls-files", "-co", "--exclude-standard", "-z"], {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    })
+      .split("\0")
+      .filter(Boolean)
+      .map((relPath) => resolve(root, relPath));
+  } catch {
+    return null;
+  }
+}
+
+function scanFile(full) {
+  if (full === SELF) return;
+  const name = full.split("/").pop();
+  if (!SCAN_EXT.test(name) && name !== ".env.example") return;
+  try {
+    if (statSync(full).size > MAX_BYTES) return;
+  } catch {
+    return;
+  }
+
+  const text = readFileSync(full, "utf8");
+  const lines = text.split("\n");
+  for (const [label, re] of RULES) {
+    lines.forEach((line, i) => {
+      const m = line.match(re);
+      if (m && !PLACEHOLDER.test(line)) {
+        findings.push({
+          file: relative(root, full),
+          line: i + 1,
+          label,
+          snippet: m[0].slice(0, 12) + "…",
+        });
+      }
+    });
+  }
+}
+
 function walk(dir) {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const full = join(dir, entry.name);
@@ -45,28 +101,20 @@ function walk(dir) {
       if (!SKIP_DIRS.has(entry.name)) walk(full);
       continue;
     }
-    if (full === SELF) continue;
-    if (!SCAN_EXT.test(entry.name) && entry.name !== ".env.example") continue;
-    if (statSync(full).size > MAX_BYTES) continue;
-
-    const text = readFileSync(full, "utf8");
-    const lines = text.split("\n");
-    for (const [label, re] of RULES) {
-      lines.forEach((line, i) => {
-        const m = line.match(re);
-        if (m && !PLACEHOLDER.test(line)) {
-          findings.push({ file: relative(root, full), line: i + 1, label, snippet: m[0].slice(0, 12) + "…" });
-        }
-      });
-    }
+    scanFile(full);
   }
 }
 
-walk(root);
+const tracked = committableFiles();
+if (tracked) {
+  for (const file of tracked) scanFile(file);
+} else {
+  walk(root);
+}
 
 if (findings.length) {
   console.error("✗ secret scan FAILED — Definition of Done #4 violated:");
   for (const f of findings) console.error(`   · ${f.file}:${f.line}  ${f.label}  (${f.snippet})`);
   process.exit(1);
 }
-console.log("✓ secret scan clean");
+console.log(`✓ secret scan clean (${tracked ? tracked.length + " committable files" : "directory walk"})`);

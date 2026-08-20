@@ -45,6 +45,10 @@ ignore = ["E501"]
 # Twister gives and what a CSPRNG deliberately does not. Nothing in this package
 # generates a secret. Scoped to seed/ so the rule still applies everywhere else.
 "meridian_agent/seed/*" = ["S311"]
+# Same reasoning for the evaluation package: a train/test split must be
+# reproducible from its seed, which is precisely what a CSPRNG refuses to be.
+# No secret is generated here either.
+"meridian_agent/evaluation/*" = ["S311"]
 
 [tool.mypy]
 python_version = "3.11"
