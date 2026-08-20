@@ -81,16 +81,28 @@ def load_corpus_into(
                 """,
                 (document.id, document.kind, document.title, document.source_uri),
             )
-        # Chunk boundaries move when the chunker or a document changes, so stale
-        # ordinals must go. Deleting per document rather than globally keeps the
-        # load safe to run while other documents are being read.
-        for document in documents:
-            cur.execute("DELETE FROM chunk WHERE document_id = %s", (document.id,))
+        # Chunks are UPSERTED, and only genuine orphans are then deleted.
+        #
+        # The first version deleted every chunk for a document and reinserted
+        # them. Simpler, and it destroys data: chunk_embedding cascades on chunk
+        # deletion, so reloading under a second embedding model wiped the first
+        # model's vectors and left 87 rows where ADR-0005 requires 174.
+        #
+        # CI caught it against the pgvector container. It could not be caught by
+        # a local run, because the destructive-test guard skips these tests
+        # against a managed host - so the container is the only place this path
+        # is ever exercised.
         for chunk in chunks:
             cur.execute(
                 """
                 INSERT INTO chunk (id, document_id, ordinal, heading, body, token_count)
                 VALUES (%s, %s, %s, %s, %s, %s)
+                ON CONFLICT (id) DO UPDATE SET
+                    document_id = EXCLUDED.document_id,
+                    ordinal = EXCLUDED.ordinal,
+                    heading = EXCLUDED.heading,
+                    body = EXCLUDED.body,
+                    token_count = EXCLUDED.token_count
                 """,
                 (
                     chunk.id,
@@ -100,6 +112,18 @@ def load_corpus_into(
                     chunk.body,
                     chunk.token_count,
                 ),
+            )
+
+        # Remove chunks a document no longer produces. Boundaries move when the
+        # chunker or a document changes, and a stale ordinal that survives is a
+        # passage retrieval can still return and cite.
+        by_document: dict[str, list[str]] = {}
+        for chunk in chunks:
+            by_document.setdefault(chunk.document_id, []).append(chunk.id)
+        for document in documents:
+            cur.execute(
+                "DELETE FROM chunk WHERE document_id = %s AND NOT (id = ANY(%s))",
+                (document.id, by_document.get(document.id, [])),
             )
     return len(documents), len(chunks)
 
