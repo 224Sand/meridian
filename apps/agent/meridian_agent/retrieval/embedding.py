@@ -31,6 +31,17 @@ class Embedder(Protocol):
     @property
     def dim(self) -> int: ...
 
+    @property
+    def similarity_threshold(self) -> float:
+        """Cosine above which two texts are treated as the same question.
+
+        A property of the EMBEDDER, never a global constant (ADR-0008). Each
+        space has its own distribution: a sparse hashed space puts unrelated
+        text near zero, while a dense neural space routinely puts unrelated text
+        at 0.5 or above. A threshold carried from one to the other returns
+        confidently wrong cache hits and raises nothing.
+        """
+
     def embed(self, texts: list[str]) -> list[list[float]]: ...
 
 
@@ -56,6 +67,15 @@ class HashingEmbedder:
 
     model = "hashing-v1"
     dim = DIM
+
+    #: Measured over paraphrase and distinct pairs drawn from the corpus:
+    #: paraphrases scored 0.679 to 0.959, distinct questions -0.065 to 0.034.
+    #: 0.60 sits an order of magnitude above the highest distinct pair and below
+    #: the lowest paraphrase. Biased toward the miss: a missed cache hit costs
+    #: one model call, a false hit returns the wrong answer to a user.
+    #: tests/test_cache.py::TestThreshold re-derives this and fails if the
+    #: separation stops holding.
+    similarity_threshold = 0.60
 
     def embed(self, texts: list[str]) -> list[list[float]]:
         return [self._embed_one(text) for text in texts]
