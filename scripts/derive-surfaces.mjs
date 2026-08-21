@@ -11,7 +11,7 @@
  *   node scripts/derive-surfaces.mjs
  */
 
-import { readFileSync, readdirSync, writeFileSync, mkdirSync } from "node:fs";
+import { readFileSync, readdirSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
@@ -59,10 +59,37 @@ const thresholds = {
 };
 
 // ---------------------------------------------------------------- evaluation
-const evaluation = json("apps/agent/reports/evaluation.json");
-const checks = Object.fromEntries(
-  evaluation.suites.flatMap((s) => s.checks.map((c) => [c.name, c])),
-);
+// The evaluation report is produced by running the suites and is gitignored --
+// it exists on a developer machine and as a CI artifact of the agent job, but
+// not in the tree. When it is absent, keep the reliability.json already
+// committed rather than failing the build or, worse, emitting zeros.
+//
+// This does not weaken the "no number is typed by hand" rule: the committed
+// file was itself derived from a real run. It only means the web build does not
+// have to wait on the agent job to produce a page whose inputs have not changed.
+//
+// Failing if BOTH are missing is deliberate -- that is the case where there is
+// genuinely nothing to show, and a blank page would be a lie by omission.
+const reportPath = resolve(root, "apps/agent/reports/evaluation.json");
+const priorPath = resolve(outDir, "reliability.json");
+if (!existsSync(reportPath)) {
+  if (!existsSync(priorPath)) {
+    throw new Error(
+      "derive-surfaces: no evaluation report and no previously derived " +
+        "reliability.json; run the evaluation suites before building.",
+    );
+  }
+  console.log(
+    "derive-surfaces: evaluation report absent; keeping the committed " +
+      "reliability.json and regenerating architecture.json only",
+  );
+}
+const evaluation = existsSync(reportPath)
+  ? json("apps/agent/reports/evaluation.json")
+  : null;
+const checks = evaluation
+  ? Object.fromEntries(evaluation.suites.flatMap((s) => s.checks.map((c) => [c.name, c])))
+  : {};
 
 const detail = (name) => required(checks[name], name).detail;
 const parseRate = (name) => {
@@ -89,90 +116,93 @@ const budgets = {
   falseRefusal: budget("FALSE_REFUSAL_BUDGET"),
 };
 
-const sample = detail("sample_is_large_enough");
-const reliability = {
-  generatedAt: new Date().toISOString(),
-  sha: execFileSync("git", ["rev-parse", "--short", "HEAD"], { cwd: root, encoding: "utf8" }).trim(),
-  thresholds,
-  sample: {
-    answerable: Number(sample.match(/(\d+)\s+answerable/)?.[1]),
-    unanswerable: Number(sample.match(/(\d+)\s+unanswerable/)?.[1]),
-  },
-  gate: {
-    falseAnswer: { ...parseRate("false_answer_rate_within_budget"), budget: budgets.falseAnswer },
-    falseRefusal: { ...parseRate("false_refusal_rate_within_budget"), budget: budgets.falseRefusal },
-  },
-  // The probe suite exists to publish what is still weak. Its checks are
-  // expected to fail; a green probe suite would mean it had stopped looking.
-  weaknesses: evaluation.suites
-    .find((s) => s.suite === "probe")
-    ?.checks.map((c) => ({ name: c.name, detail: c.detail, value: c.value })) ?? [],
-  model: (() => {
-    const m = json("apps/agent/sandscope_agent/evaluation/model/metadata.json");
-    return {
-      kind: m.model,
-      format: m.format,
-      trainedOn: m.trained_on,
-      features: m.features.length,
-      featureNames: m.features,
-      auc: m.cross_validated_auc,
-      baselineAuc: m.baseline_auc,
-      operatingPoint: m.operating_point,
-    };
-  })(),
-  reranker: (() => {
-    const m = json("apps/agent/sandscope_agent/retrieval/reranker/metrics.json");
-    return {
-      baseModel: m.base_model,
-      trainingPairs: m.training_pairs,
-      heldOutDocuments: m.held_out_documents,
-      latencyP50Ms: m.rerank_latency_p50_ms,
-      candidates: m.candidates,
-      // Document-level was already 0.986 and hid the whole effect (D-003).
-      // Both levels ship so the saturated metric stays visible next to the one
-      // that could actually move.
-      documentLevelMrr: m.document_level.hybrid.mrr,
-      chunkLevel: {
-        hybrid: m.chunk_level.hybrid.mrr,
-        pretrained: m.chunk_level.pretrained_reranked.mrr,
-        finetuned: m.chunk_level.finetuned_reranked.mrr,
-      },
-    };
-  })(),
-  defects: (() => {
-    const rows = read("docs/04-quality/DEFECT_LOG.md")
-      .split("\n")
-      .filter((l) => /^\|\s*D-\d+\s*\|/.test(l))
-      .map((l) => {
-        const c = l.split("|").map((x) => x.trim());
-        return {
-          id: c[1],
-          foundIn: c[2],
-          sprint: c[3],
-          severity: c[4].replace(/\*/g, ""),
-          description: c[5],
-          rootCause: c[6].replace(/\*/g, ""),
-        };
-      });
-    return {
-      total: rows.length,
-      severity1: rows.filter((r) => r.severity === "1").length,
-      caughtByReview: 0, // stated in the log, and the point of it
-      rows,
-    };
-  })(),
-  postmortems: readdirSync(resolve(root, "docs/06-operations/postmortems"))
-    .filter((f) => f.endsWith(".md"))
-    .sort()
-    .map((f) => {
-      const body = read(`docs/06-operations/postmortems/${f}`);
+let reliability = null;
+if (evaluation) {
+  const sample = detail("sample_is_large_enough");
+  reliability = {
+    generatedAt: new Date().toISOString(),
+    sha: execFileSync("git", ["rev-parse", "--short", "HEAD"], { cwd: root, encoding: "utf8" }).trim(),
+    thresholds,
+    sample: {
+      answerable: Number(sample.match(/(\d+)\s+answerable/)?.[1]),
+      unanswerable: Number(sample.match(/(\d+)\s+unanswerable/)?.[1]),
+    },
+    gate: {
+      falseAnswer: { ...parseRate("false_answer_rate_within_budget"), budget: budgets.falseAnswer },
+      falseRefusal: { ...parseRate("false_refusal_rate_within_budget"), budget: budgets.falseRefusal },
+    },
+    // The probe suite exists to publish what is still weak. Its checks are
+    // expected to fail; a green probe suite would mean it had stopped looking.
+    weaknesses: evaluation.suites
+      .find((s) => s.suite === "probe")
+      ?.checks.map((c) => ({ name: c.name, detail: c.detail, value: c.value })) ?? [],
+    model: (() => {
+      const m = json("apps/agent/sandscope_agent/evaluation/model/metadata.json");
       return {
-        file: f,
-        title: body.match(/^#\s*(.+)$/m)?.[1]?.replace(/^Postmortem\s*—\s*/, "") ?? f,
-        date: body.match(/\*\*Date:\*\*\s*([\d-]+)/)?.[1] ?? null,
+        kind: m.model,
+        format: m.format,
+        trainedOn: m.trained_on,
+        features: m.features.length,
+        featureNames: m.features,
+        auc: m.cross_validated_auc,
+        baselineAuc: m.baseline_auc,
+        operatingPoint: m.operating_point,
       };
-    }),
-};
+    })(),
+    reranker: (() => {
+      const m = json("apps/agent/sandscope_agent/retrieval/reranker/metrics.json");
+      return {
+        baseModel: m.base_model,
+        trainingPairs: m.training_pairs,
+        heldOutDocuments: m.held_out_documents,
+        latencyP50Ms: m.rerank_latency_p50_ms,
+        candidates: m.candidates,
+        // Document-level was already 0.986 and hid the whole effect (D-003).
+        // Both levels ship so the saturated metric stays visible next to the one
+        // that could actually move.
+        documentLevelMrr: m.document_level.hybrid.mrr,
+        chunkLevel: {
+          hybrid: m.chunk_level.hybrid.mrr,
+          pretrained: m.chunk_level.pretrained_reranked.mrr,
+          finetuned: m.chunk_level.finetuned_reranked.mrr,
+        },
+      };
+    })(),
+    defects: (() => {
+      const rows = read("docs/04-quality/DEFECT_LOG.md")
+        .split("\n")
+        .filter((l) => /^\|\s*D-\d+\s*\|/.test(l))
+        .map((l) => {
+          const c = l.split("|").map((x) => x.trim());
+          return {
+            id: c[1],
+            foundIn: c[2],
+            sprint: c[3],
+            severity: c[4].replace(/\*/g, ""),
+            description: c[5],
+            rootCause: c[6].replace(/\*/g, ""),
+          };
+        });
+      return {
+        total: rows.length,
+        severity1: rows.filter((r) => r.severity === "1").length,
+        caughtByReview: 0, // stated in the log, and the point of it
+        rows,
+      };
+    })(),
+    postmortems: readdirSync(resolve(root, "docs/06-operations/postmortems"))
+      .filter((f) => f.endsWith(".md"))
+      .sort()
+      .map((f) => {
+        const body = read(`docs/06-operations/postmortems/${f}`);
+        return {
+          file: f,
+          title: body.match(/^#\s*(.+)$/m)?.[1]?.replace(/^Postmortem\s*—\s*/, "") ?? f,
+          date: body.match(/\*\*Date:\*\*\s*([\d-]+)/)?.[1] ?? null,
+        };
+      }),
+  };
+}
 
 // -------------------------------------------------------------- architecture
 const adrDir = resolve(root, "docs/03-architecture/adr");
@@ -210,8 +240,8 @@ const providers = [...chainBlock.matchAll(/(?:OpenAICompatibleProvider\((\w+),|(
 if (providers.length === 0) throw new Error("derive-surfaces: provider chain not parsed");
 
 const architecture = {
-  generatedAt: reliability.generatedAt,
-  sha: reliability.sha,
+  generatedAt: new Date().toISOString(),
+  sha: execFileSync("git", ["rev-parse", "--short", "HEAD"], { cwd: root, encoding: "utf8" }).trim(),
   providers,
   adrs,
   counts: {
@@ -220,11 +250,14 @@ const architecture = {
   },
 };
 
-writeFileSync(resolve(outDir, "reliability.json"), JSON.stringify(reliability, null, 2) + "\n");
+if (evaluation) {
+  writeFileSync(resolve(outDir, "reliability.json"), JSON.stringify(reliability, null, 2) + "\n");
+}
 writeFileSync(resolve(outDir, "architecture.json"), JSON.stringify(architecture, null, 2) + "\n");
 
 console.log(
-  `derived reliability.json (${reliability.defects.total} defects, ` +
-    `${reliability.weaknesses.length} published weaknesses) and ` +
+  (reliability
+    ? `derived reliability.json (${reliability.defects.total} defects, ${reliability.weaknesses.length} published weaknesses) and `
+    : "derived ") +
     `architecture.json (${adrs.length} ADRs, ${providers.length} providers: ${providers.join(" → ")})`,
 );
