@@ -1,23 +1,23 @@
 {
-  "generatedAt": "2026-08-21T16:54:58.431Z",
+  "generatedAt": "2026-08-21T17:38:26.896Z",
   "repo": "224Sand/sandscope",
-  "sha": "003dd30",
-  "commits": 55,
+  "sha": "eabe499",
+  "commits": 56,
   "firstCommit": "2026-08-20T04:21:57+05:30",
-  "lastCommit": "2026-08-21T22:21:01+05:30",
+  "lastCommit": "2026-08-21T22:25:07+05:30",
   "tests": {
-    "total": 351,
-    "files": 19
+    "total": 357,
+    "files": 20
   },
   "lines": {
     "agent": 5331,
-    "tests": 3318,
+    "tests": 3427,
     "web": 2336,
-    "tooling": 2563
+    "tooling": 2653
   },
   "docs": {
-    "files": "38",
-    "lines": 2922
+    "files": "43",
+    "lines": 3185
   },
   "requirements": {
     "total": 58,
@@ -25,7 +25,7 @@
     "planned": 45
   },
   "defects": {
-    "total": 15,
+    "total": 16,
     "severityOne": 5,
     "entries": [
       {
@@ -162,6 +162,15 @@
         "description": "The first README checker could not fail: it searched for each figure as a substring of the whole file, so changing `Commits \\",
         "cause": "54` to 99 still passed because \"54\" appears in \"54% of questions\"",
         "status": "A guard written to confirm rather than to detect — caught only by deliberately corrupting a value"
+      },
+      {
+        "id": "D-016",
+        "found": "Sprint 7",
+        "sprint": "7",
+        "severity": "2",
+        "description": "Sprints 6 and 7 were worked and shipped with no planning ceremony and no plan document; the sprint numbers existed only in defect-log entries, and a Sprint 5 retrospective commitment to raise exactly this was never honoured",
+        "cause": "Governance applied to the product but not to the process; the control relied on someone remembering",
+        "status": "Fixed, guarded"
       }
     ]
   },
@@ -257,6 +266,18 @@
       "number": 5,
       "name": "Console",
       "release": "0.5.0",
+      "velocity": ""
+    },
+    {
+      "number": 6,
+      "name": "Experience",
+      "release": "0.6.0",
+      "velocity": ""
+    },
+    {
+      "number": 7,
+      "name": "Proof Surfaces",
+      "release": "0.7.0",
       "velocity": ""
     }
   ]

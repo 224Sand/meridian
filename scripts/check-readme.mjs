@@ -28,7 +28,10 @@ import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+// An optional root lets the guard be pointed at a fixture and observed to
+// FAIL, which is Definition of Done item 9. A guard that has only ever been
+// run against a passing tree has not been tested.
+const root = resolve(process.argv[2] ?? resolve(dirname(fileURLToPath(import.meta.url)), ".."));
 const readme = readFileSync(resolve(root, "README.md"), "utf8");
 const delivery = JSON.parse(readFileSync(resolve(root, "apps/web/src/generated/delivery.json"), "utf8"));
 const reliability = JSON.parse(readFileSync(resolve(root, "apps/web/src/generated/reliability.json"), "utf8"));

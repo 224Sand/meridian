@@ -23,7 +23,10 @@ import { execFileSync } from "node:child_process";
 import { dirname, resolve, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+// An optional root lets the guard be pointed at a fixture and observed to
+// FAIL, which is Definition of Done item 9. A guard that has only ever been
+// run against a passing tree has not been tested.
+const root = resolve(process.argv[2] ?? resolve(dirname(fileURLToPath(import.meta.url)), ".."));
 const VALID = new Set(["Planned", "Building", "Done"]);
 
 const tracked = execFileSync("git", ["ls-files"], { cwd: root, encoding: "utf8" })

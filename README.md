@@ -93,7 +93,8 @@ level a citation actually points at is what made the improvement visible — see
 
 ## How it was built
 
-Six sprints, eleven named delivery roles and four stakeholder roles, five
+Nine sprints — eight closed, one open — eleven named delivery roles and
+four stakeholder roles, five
 lifecycle lenses (product stage · SDLC · PDLC · AIDLC mapped to NIST AI RMF ·
 Agile). The governance is real rather than decorative: **a requirement that
 claims `Done` while the test it names is absent fails the build.**
@@ -104,9 +105,9 @@ defect count, and including the numbers in this README.
 
 | | |
 |---|---|
-| Tests | 351 across 19 files |
+| Tests | 357 across 20 files |
 | Requirements | 58, of which 13 `Done` and each names a test that exists |
-| Defects logged | 15, of which 5 severity 1 |
+| Defects logged | 16, of which 5 severity 1 |
 | ADRs | 11 |
 
 **Not one defect was caught by code review, and not one by a unit test written

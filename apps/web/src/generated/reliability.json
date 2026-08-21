@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-08-21T16:54:58.559Z",
-  "sha": "003dd30",
+  "generatedAt": "2026-08-21T17:38:27.024Z",
+  "sha": "eabe499",
   "thresholds": {
     "insufficientBelow": 0.74,
     "sufficientAbove": 10.38
@@ -90,7 +90,7 @@
     }
   },
   "defects": {
-    "total": 15,
+    "total": 16,
     "severity1": 5,
     "caughtByReview": 0,
     "rows": [
@@ -213,6 +213,14 @@
         "severity": "3",
         "description": "The first README checker could not fail: it searched for each figure as a substring of the whole file, so changing `Commits \\",
         "rootCause": "54` to 99 still passed because \"54\" appears in \"54% of questions\""
+      },
+      {
+        "id": "D-016",
+        "foundIn": "Sprint 7",
+        "sprint": "7",
+        "severity": "2",
+        "description": "Sprints 6 and 7 were worked and shipped with no planning ceremony and no plan document; the sprint numbers existed only in defect-log entries, and a Sprint 5 retrospective commitment to raise exactly this was never honoured",
+        "rootCause": "Governance applied to the product but not to the process; the control relied on someone remembering"
       }
     ]
   },
