@@ -19,11 +19,13 @@ from collections.abc import AsyncIterator, Iterator
 from contextlib import asynccontextmanager
 from typing import Any
 
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import Depends, FastAPI, HTTPException, Request, status
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
 from sandscope_agent.api.security import require_token
+from sandscope_agent.db import runs as run_store
+from sandscope_agent.db.engine import DatabaseNotConfiguredError, connect
 from sandscope_agent.orchestrator.budget import SpendGuard
 from sandscope_agent.orchestrator.graph import Dependencies, RunState, build_graph
 from sandscope_agent.orchestrator.workloads import WORKLOADS, WorkloadInput
@@ -80,6 +82,10 @@ app = FastAPI(
 
 class RunRequest(BaseModel):
     workload: str = Field(description="incident_triage or change_review")
+    #: Supplied by the BFF from a cookie. Demo-grade identity, stated as such
+    #: in the threat model - it scopes memory and binds approvals, and it is not
+    #: authentication.
+    session_id: str = Field(default="anonymous", max_length=64)
     subject: str = Field(min_length=1, max_length=200)
     body: str = Field(min_length=1, max_length=4000)
     context: dict[str, str] = Field(default_factory=dict)
@@ -161,8 +167,11 @@ def workloads() -> dict[str, Any]:
 
 
 @app.post("/v1/runs/stream", dependencies=[Depends(require_token)])
-def stream_run(request: RunRequest) -> StreamingResponse:
+def stream_run(request: RunRequest, http_request: Request) -> StreamingResponse:
     """Execute a run, streaming each node as it completes."""
+    client_ip = http_request.headers.get("x-forwarded-for", "").split(",")[0].strip() or (
+        http_request.client.host if http_request.client else "unknown"
+    )
     if request.workload not in WORKLOADS:
         raise HTTPException(
             status_code=422,  # UNPROCESSABLE_CONTENT; the named constant was renamed
@@ -234,6 +243,31 @@ def stream_run(request: RunRequest) -> StreamingResponse:
             yield _sse("error", {"error": type(error).__name__, "detail": str(error)[:300]})
             return
 
+        # Persistence is best-effort and never blocks the stream. A database
+        # outage must degrade the record, not the run the visitor is watching.
+        persisted = False
+        try:
+            with connect() as conn:
+                run_store.ensure_session(conn, request.session_id, run_store.hash_ip(client_ip))
+                conn.commit()
+                run_store.save_run(
+                    conn,
+                    run_id=run_id,
+                    session_id=request.session_id,
+                    workload=request.workload,
+                    subject=request.subject,
+                    state=final,
+                    cost_usd=deps.guard.actual_usd,
+                )
+                persisted = True
+        except Exception:
+            # Broad on purpose. Persistence can fail as a missing DATABASE_URL,
+            # a network timeout, a constraint violation or a driver error, and
+            # the correct response to every one is the same: record that the run
+            # was not persisted and let the visitor keep watching it. A database
+            # outage must degrade the RECORD, not the run.
+            persisted = False
+
         yield _sse(
             "run_completed",
             {
@@ -247,6 +281,7 @@ def stream_run(request: RunRequest) -> StreamingResponse:
                 "providers": [{"provider": e.provider, "event": e.event} for e in router_events],
                 "total_ms": round((time.perf_counter() - run_started) * 1000, 2),
                 "spans": spans,
+                "persisted": persisted,
                 "ledger": [
                     {
                         "provider": e.provider,
@@ -307,3 +342,65 @@ def _summarise(node: str, patch: dict[str, Any]) -> dict[str, Any]:
     if node in ("refuse", "escalate", "await_approval", "emit"):
         return {"status": patch.get("status")}
     return {}
+
+
+class ApprovalRequest(BaseModel):
+    decision: str = Field(description="approved or rejected")
+    decided_by: str = Field(default="console", max_length=120)
+
+
+@app.get("/v1/runs/{run_id}/approval", dependencies=[Depends(require_token)])
+def read_approval(run_id: str) -> dict[str, Any]:
+    """The gated run, if it is still awaiting a decision."""
+    try:
+        with connect() as conn:
+            pending = run_store.load_pending_approval(conn, run_id)
+    except DatabaseNotConfiguredError as error:
+        raise HTTPException(status_code=503, detail=str(error)) from error
+    if pending is None:
+        raise HTTPException(status_code=404, detail="no undecided approval for this run")
+    return {
+        "run_id": pending.id,
+        "risk": pending.risk,
+        "action": pending.proposal,
+        "status": pending.status,
+    }
+
+
+@app.post("/v1/runs/{run_id}/approve", dependencies=[Depends(require_token)])
+def decide(run_id: str, request: ApprovalRequest) -> dict[str, Any]:
+    """Record a decision and open the continuation run.
+
+    The gated run is never resumed. `await_approval` is terminal by topology
+    (ADR-0006), so a decision creates a NEW run pointing back at it. Two rows
+    for one approved incident is the price of a control that cannot
+    auto-proceed, and it is the whole reason the control is worth anything.
+    """
+    try:
+        with connect() as conn:
+            continuation = run_store.record_decision(
+                conn, run_id, request.decision, request.decided_by
+            )
+    except DatabaseNotConfiguredError as error:
+        raise HTTPException(status_code=503, detail=str(error)) from error
+    except ValueError as error:
+        # A decision on an unknown or already-decided run is a 409, not a 500:
+        # the caller's request was well-formed and the state has moved on.
+        raise HTTPException(status_code=409, detail=str(error)) from error
+
+    return {
+        "decided": request.decision,
+        "gated_run": run_id,
+        "continuation_run": continuation,
+        "note": "the gated run was not resumed; this is a new run carrying the decision",
+    }
+
+
+@app.get("/v1/sessions/{session_id}/memory", dependencies=[Depends(require_token)])
+def memory(session_id: str) -> dict[str, Any]:
+    """What this session has already looked at."""
+    try:
+        with connect() as conn:
+            return {"session_id": session_id, "items": run_store.recall(conn, session_id)}
+    except DatabaseNotConfiguredError:
+        return {"session_id": session_id, "items": []}
