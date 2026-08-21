@@ -24,6 +24,7 @@
 | D-012 | Sprint 7 | 7 | 2 | No body-size limit on the run endpoint; a 200KB body reached the agent and returned 502 instead of being refused | Cost bounds were applied to spend and rate, but not to input length | Fixed, guarded |
 | D-013 | Sprint 7 | 7 | **1** | The rate-limit pen test could not fail: it sent 8 requests against a limit of 20, and its pass condition accepted `all(c >= 400)`, so a service that was DOWN reported as correctly rate limited | A test written to pass rather than to detect | Fixed, guarded |
 | D-014 | Sprint 7 | 7 | 2 | Traceability statuses drifted in both directions: 4 rows used statuses the legend never defined (`Done (design)`/`(gate)`/`(decision)`) which the delivery page counted as done, and 1 row sat at `Planned` while its test had passed for four sprints | A status column maintained by hand, rendered publicly as fact | Fixed, guarded |
+| D-015 | Sprint 7 | 7 | 3 | The first README checker could not fail: it searched for each figure as a substring of the whole file, so changing `Commits \| 54` to 99 still passed because "54" appears in "54% of questions" | A guard written to confirm rather than to detect — caught only by deliberately corrupting a value | Fixed, guarded |
 
 ## Where these were found, which is the finding
 
@@ -37,6 +38,7 @@
 | CI reporting a failure whose visible cause was wrong | 1 (D-011) |
 | Running the security suite against a live system | 2 (D-012, D-013) |
 | Deriving a public number instead of trusting the document | 1 (D-014) |
+| Deliberately breaking a guard to see whether it notices | 1 (D-015) |
 | **Code review** | **0** |
 | **Unit tests written before the defect** | **0** |
 
@@ -51,7 +53,12 @@ own *correction* (0.886, yes) until the two are wired together and run.
 ## Policy
 
 A defect is logged here when found, before it is fixed, with its root cause
-class. A defect that reaches a deployed environment additionally gets a
+class.
+
+A guard is not trusted until it has been run against the defect it claims to
+catch and observed to fail. D-011 and D-015 were both found that way, and D-015
+would otherwise have shipped as a check that could never fail -- inside the
+script written to stop exactly that. A defect that reaches a deployed environment additionally gets a
 postmortem in `docs/06-operations/postmortems/`.
 
 ## D-011 in detail — when every visible signal points the wrong way

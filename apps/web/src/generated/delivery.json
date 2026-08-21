@@ -1,23 +1,23 @@
 {
-  "generatedAt": "2026-08-21T16:50:28.964Z",
+  "generatedAt": "2026-08-21T16:54:58.431Z",
   "repo": "224Sand/sandscope",
-  "sha": "c2e1689",
-  "commits": 54,
+  "sha": "003dd30",
+  "commits": 55,
   "firstCommit": "2026-08-20T04:21:57+05:30",
-  "lastCommit": "2026-08-21T22:14:11+05:30",
+  "lastCommit": "2026-08-21T22:21:01+05:30",
   "tests": {
     "total": 351,
     "files": 19
   },
   "lines": {
     "agent": 5331,
-    "tests": 3317,
+    "tests": 3318,
     "web": 2336,
-    "tooling": 2485
+    "tooling": 2563
   },
   "docs": {
     "files": "38",
-    "lines": 2916
+    "lines": 2922
   },
   "requirements": {
     "total": 58,
@@ -25,7 +25,7 @@
     "planned": 45
   },
   "defects": {
-    "total": 14,
+    "total": 15,
     "severityOne": 5,
     "entries": [
       {
@@ -153,6 +153,15 @@
         "description": "Traceability statuses drifted in both directions: 4 rows used statuses the legend never defined (`Done (design)`/`(gate)`/`(decision)`) which the delivery page counted as done, and 1 row sat at `Planned` while its test had passed for four sprints",
         "cause": "A status column maintained by hand, rendered publicly as fact",
         "status": "Fixed, guarded"
+      },
+      {
+        "id": "D-015",
+        "found": "Sprint 7",
+        "sprint": "7",
+        "severity": "3",
+        "description": "The first README checker could not fail: it searched for each figure as a substring of the whole file, so changing `Commits \\",
+        "cause": "54` to 99 still passed because \"54\" appears in \"54% of questions\"",
+        "status": "A guard written to confirm rather than to detect — caught only by deliberately corrupting a value"
       }
     ]
   },
