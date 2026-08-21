@@ -35,6 +35,38 @@ jobs:
       - name: Secret scan (Definition of Done item 4)
         run: node scripts/check-secrets.mjs
 
+  # The web application was never built in CI until Sprint 8.
+  #
+  # Its absence was invisible because every other job passed: a Dependabot PR
+  # taking Next from 15 to 16 reported 10/10 green while the production build
+  # failed on all seven pages. Nothing in the pipeline had ever run `next build`.
+  # A green tick that exercises none of the code under change is worse than no
+  # tick, because it is read as evidence. Logged as D-018.
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install
+        run: npm ci
+      # No lint step: `next lint` is deprecated and prompts interactively for an
+      # ESLint configuration, which would hang the runner rather than fail it.
+      # A step that can hang is worse than an absent one. Type checking and the
+      # build are what actually gate this app; ESLint setup is tracked separately.
+      - name: Type check
+        run: npx tsc --noEmit
+      - name: Build
+        run: npm run build
+      - name: Audit dependencies
+        run: npm audit --audit-level=high
+
   agent:
     name: Agent runtime
     runs-on: ubuntu-latest

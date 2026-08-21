@@ -7,7 +7,7 @@
  */
 import { NextResponse } from "next/server";
 
-import config from "../../../../../../product.config.json";
+import config from "@/generated/product.config.json";
 
 export const runtime = "nodejs";
 export const revalidate = 300;

@@ -1,6 +1,6 @@
 import SystemMap from "@/components/SystemMap";
 import data from "@/generated/architecture.json";
-import config from "../../../../../product.config.json";
+import config from "@/generated/product.config.json";
 
 export const metadata = { title: `Architecture — ${config.name}` };
 

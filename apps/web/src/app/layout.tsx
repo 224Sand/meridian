@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import config from "../../../../product.config.json";
+import config from "@/generated/product.config.json";
 import "./globals.css";
 
 export const metadata: Metadata = {

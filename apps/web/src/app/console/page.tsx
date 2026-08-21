@@ -1,5 +1,5 @@
 import Console from "@/components/Console";
-import config from "../../../../../product.config.json";
+import config from "@/generated/product.config.json";
 
 export const metadata = { title: `Console — ${config.name}` };
 

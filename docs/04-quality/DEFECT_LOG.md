@@ -27,6 +27,7 @@
 | D-015 | Sprint 7 | 7 | 3 | The first README checker could not fail: it searched for each figure as a substring of the whole file, so changing `Commits \| 54` to 99 still passed because "54" appears in "54% of questions" | A guard written to confirm rather than to detect — caught only by deliberately corrupting a value | Fixed, guarded |
 | D-016 | Sprint 7 | 7 | 2 | Sprints 6 and 7 were worked and shipped with no planning ceremony and no plan document; the sprint numbers existed only in defect-log entries, and a Sprint 5 retrospective commitment to raise exactly this was never honoured | Governance applied to the product but not to the process; the control relied on someone remembering | Fixed, guarded |
 | D-017 | Sprint 8 | 8 | 2 | ADR-0003 placed the agent runtime on Hugging Face Docker Spaces "because it is free"; Docker Spaces are PRO-only, so three sprints of deployment work targeted a platform that cannot host it at $0 | A pricing claim recorded in an ADR without ever being read from the pricing page | Fixed, guarded |
+| D-018 | Sprint 8 | 8 | **1** | CI never built the web application. A Dependabot PR taking Next 15→16 reported 10/10 green while the production build failed on all seven pages; no job had ever run `next build` | A pipeline whose green tick exercises none of the code under change | Fixed, guarded |
 
 ## Where these were found, which is the finding
 
@@ -43,6 +44,7 @@
 | Deliberately breaking a guard to see whether it notices | 1 (D-015) |
 | The Product Owner asking a direct question | **1** (D-016) |
 | Reaching the deploy and finding the platform had changed | 1 (D-017) |
+| Building a dependency PR by hand instead of trusting its checks | **1** (D-018) |
 | **Code review** | **0** |
 | **Unit tests written before the defect** | **0** |
 

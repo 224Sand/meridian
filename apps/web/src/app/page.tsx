@@ -5,7 +5,7 @@ import {
 } from "@/components/Artifact";
 import Scene from "@/components/Scene";
 import ScrollScrubbed from "@/components/ScrollScrubbed";
-import config from "../../../../product.config.json";
+import config from "@/generated/product.config.json";
 
 /**
  * The landing surface (DR-001).

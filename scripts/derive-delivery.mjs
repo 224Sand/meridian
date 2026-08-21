@@ -151,6 +151,20 @@ const record = {
 };
 
 writeFileSync(out, JSON.stringify(record, null, 2) + "\n");
+
+// Mirror the product config INTO the app's own source tree.
+//
+// Every page previously imported ../../../../../product.config.json -- six
+// levels up, outside apps/web. Webpack allowed that; Turbopack, which Next 16
+// uses for production builds, refuses any import that escapes the project root,
+// and the build fails on all seven files at once.
+//
+// Copying it at derive time keeps product.config.json as the single source of
+// truth while giving the app a path it is allowed to resolve.
+writeFileSync(
+  resolve(root, "apps/web/src/generated/product.config.json"),
+  read("product.config.json"),
+);
 process.stdout.write(
   `derived ${record.commits} commits · ${record.tests.total} tests · ` +
   `${record.requirements.total} requirements · ${record.defects.total} defects · ` +

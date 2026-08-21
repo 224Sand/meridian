@@ -1,6 +1,6 @@
 import CiStatus from "@/components/CiStatus";
 import record from "@/generated/delivery.json";
-import config from "../../../../../product.config.json";
+import config from "@/generated/product.config.json";
 
 export const metadata = { title: `Delivery — ${config.name}` };
 

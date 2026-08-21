@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-08-21T18:41:58.128Z",
-  "sha": "37ed515",
+  "generatedAt": "2026-08-21T23:38:14.449Z",
+  "sha": "396c874",
   "thresholds": {
     "insufficientBelow": 0.74,
     "sufficientAbove": 10.38
@@ -90,8 +90,8 @@
     }
   },
   "defects": {
-    "total": 17,
-    "severity1": 5,
+    "total": 18,
+    "severity1": 6,
     "caughtByReview": 0,
     "rows": [
       {
@@ -229,6 +229,14 @@
         "severity": "2",
         "description": "ADR-0003 placed the agent runtime on Hugging Face Docker Spaces \"because it is free\"; Docker Spaces are PRO-only, so three sprints of deployment work targeted a platform that cannot host it at $0",
         "rootCause": "A pricing claim recorded in an ADR without ever being read from the pricing page"
+      },
+      {
+        "id": "D-018",
+        "foundIn": "Sprint 8",
+        "sprint": "8",
+        "severity": "1",
+        "description": "CI never built the web application. A Dependabot PR taking Next 15→16 reported 10/10 green while the production build failed on all seven pages; no job had ever run `next build`",
+        "rootCause": "A pipeline whose green tick exercises none of the code under change"
       }
     ]
   },

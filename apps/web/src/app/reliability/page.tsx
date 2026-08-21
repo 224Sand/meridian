@@ -1,6 +1,6 @@
 import BudgetBar from "@/components/BudgetBar";
 import data from "@/generated/reliability.json";
-import config from "../../../../../product.config.json";
+import config from "@/generated/product.config.json";
 
 export const metadata = { title: `Reliability — ${config.name}` };
 
