@@ -30,9 +30,21 @@ export default function Architecture() {
         </p>
       </header>
 
+      <p className="desktop-note">
+        Built for a laptop display — everything here works on a phone, but the diagrams
+        and tables scroll sideways. Safari or Chrome on a Mac or PC shows it as intended.
+      </p>
+
+
       <section className="panel" style={{ marginBottom: "var(--s6)" }}>
         <h3 style={{ marginBottom: "var(--s5)" }}>Request path</h3>
-        <SystemMap />
+        {/* Scrolls inside its own box below ~700px rather than scaling its
+            labels down to an unreadable size. See globals.css. */}
+        <div className="scroll-x">
+          <div style={{ minWidth: 720 }}>
+            <SystemMap />
+          </div>
+        </div>
         <p style={{ color: "var(--text-3)", fontSize: "0.8125rem", marginTop: "var(--s5)" }}>
           The two dashed returns are the paths that never reach a model: a semantic cache hit,
           and an <span className="mono">INSUFFICIENT</span> verdict. The second emits nothing

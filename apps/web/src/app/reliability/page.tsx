@@ -50,6 +50,12 @@ export default function Reliability() {
         </p>
       </header>
 
+      <p className="desktop-note">
+        Built for a laptop display — everything here works on a phone, but the diagrams
+        and tables scroll sideways. Safari or Chrome on a Mac or PC shows it as intended.
+      </p>
+
+
       {/* ---------------------------------------------------------- the gate */}
       <section className="panel" style={{ marginBottom: "var(--s6)" }}>
         <h3 style={{ marginBottom: "var(--s3)" }}>The refusal decision</h3>

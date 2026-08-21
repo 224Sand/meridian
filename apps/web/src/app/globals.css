@@ -97,6 +97,62 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 .rise { animation: rise var(--t-considered) both; }
 
+/* ---------------------------------------------------------------- small screens
+   The site is designed for a laptop display and says so, but it has to be
+   usable on a phone rather than merely not broken. Two things actually break
+   below ~700px, and both are fixed by letting the element scroll inside itself
+   instead of squeezing it:
+
+   1. The nav needs 511px of links and has 327px at 375. Wrapping it to two
+      lines pushes the content down on every page; scrolling it keeps the bar
+      one row and keeps every destination reachable.
+   2. The request-path diagram is drawn in an 880-unit viewBox. Scaled to fit a
+      phone it renders its 9.5px labels at about 3.5px, which is not a diagram,
+      it is a texture. It keeps a min-width and scrolls horizontally so the
+      labels stay at a readable size.
+
+   Neither uses a hover affordance, because a phone has no hover. */
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: var(--s5);
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  /* Fade the right edge so a cut-off link reads as "there is more", which is
+     the only cue available without a visible scrollbar. */
+  mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+}
+.nav-links::-webkit-scrollbar { display: none; }
+.nav-links > a { white-space: nowrap; }
+
+/* A block that scrolls inside its own box rather than widening the page. */
+.scroll-x {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Shown only on the screens it applies to. A permanent "best viewed on
+   desktop" banner on a laptop would be noise. */
+.desktop-note { display: none; }
+
+@media (max-width: 700px) {
+  body { font-size: 1rem; }
+  .wrap { padding: 0 var(--s4); }
+  .panel { padding: var(--s4); }
+  .nav-links { gap: var(--s4); }
+  p { max-width: none; }
+  .desktop-note {
+    display: block;
+    color: var(--text-3);
+    font-size: 0.75rem;
+    border-left: 2px solid var(--line);
+    padding-left: var(--s3);
+    margin-bottom: var(--s5);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after {

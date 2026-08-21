@@ -35,12 +35,23 @@ function required(value, what) {
 // Read from the module that enforces them. A page that quoted these from memory
 // would keep displaying 0.86 after the code moved on -- which is exactly how
 // D-008 (the cache threshold) came to be wrong in the first place.
+// Reads `NAME = <number>` without constructing a regex from a variable.
+// Building one would be safe here -- every name is a literal in this file --
+// but scanning lines is simpler, and it keeps the SAST gate meaningful rather
+// than teaching it to ignore another rule.
+function pyConstant(source, name) {
+  for (const line of source.split("\n")) {
+    const eq = line.indexOf("=");
+    if (eq < 0 || line.trimStart().startsWith("#")) continue;
+    if (line.slice(0, eq).trim() !== name) continue;
+    const value = Number.parseFloat(line.slice(eq + 1).trim());
+    if (!Number.isNaN(value)) return value;
+  }
+  return undefined;
+}
+
 const evidenceSrc = read("apps/agent/sandscope_agent/retrieval/evidence.py");
-const num = (name) =>
-  required(
-    Number(evidenceSrc.match(new RegExp(`^${name}\\s*=\\s*([0-9.]+)`, "m"))?.[1]),
-    name,
-  );
+const num = (name) => required(pyConstant(evidenceSrc, name), name);
 
 const thresholds = {
   insufficientBelow: num("INSUFFICIENT_BELOW"),
@@ -72,11 +83,7 @@ const parseRate = (name) => {
 // check as "over budget". Parsed now, for the same reason as everything else on
 // these pages.
 const harness = read("apps/agent/sandscope_agent/evaluation/harness.py");
-const budget = (name) =>
-  required(
-    Number(harness.match(new RegExp(`^${name}\\s*=\\s*([0-9.]+)`, "m"))?.[1]),
-    name,
-  );
+const budget = (name) => required(pyConstant(harness, name), name);
 const budgets = {
   falseAnswer: budget("FALSE_ANSWER_BUDGET"),
   falseRefusal: budget("FALSE_REFUSAL_BUDGET"),

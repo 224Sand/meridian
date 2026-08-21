@@ -32,8 +32,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         >
           <div
-            className="wrap"
-            style={{ display: "flex", gap: "var(--s5)", alignItems: "center", height: 52 }}
+            className="wrap nav-links"
+            style={{ height: 52 }}
           >
             <a href="/" className="mono" style={{ color: "var(--text)", fontSize: "0.8125rem", letterSpacing: "0.04em" }}>
               {config.wordmark}
