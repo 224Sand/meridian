@@ -90,7 +90,20 @@ export default function Console() {
   const [result, setResult] = useState<RunCompleted | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [openCitation, setOpenCitation] = useState<string | null>(null);
+  const [decision, setDecision] = useState<string | null>(null);
   const abort = useRef<AbortController | null>(null);
+
+  /**
+   * Session identity. sessionStorage rather than a cookie: it scopes memory and
+   * binds approvals to the tab that created them, and it is explicitly NOT
+   * authentication - the threat model records it as demo-grade (T-17).
+   */
+  const sessionId = useRef<string>("");
+  if (typeof window !== "undefined" && !sessionId.current) {
+    const existing = window.sessionStorage.getItem("sandscope.session");
+    sessionId.current = existing ?? `sess-${crypto.randomUUID().slice(0, 12)}`;
+    window.sessionStorage.setItem("sandscope.session", sessionId.current);
+  }
 
   const start = useCallback(async () => {
     abort.current?.abort();
@@ -101,12 +114,14 @@ export default function Console() {
     setEvents([]);
     setResult(null);
     setError(null);
+    setDecision(null);
 
     try {
       const response = await fetch("/api/runs/stream", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          session_id: sessionId.current,
           workload: preset.workload,
           subject: preset.subject,
           body: preset.body,
@@ -352,10 +367,35 @@ export default function Console() {
               </p>
               {/* Neither button is the primary action. A gate where one choice is
                   styled as the obvious one is not a gate. */}
-              <div style={{ display: "flex", gap: "var(--s3)" }}>
-                <button disabled title="Approval lands in Sprint 6">Approve</button>
-                <button disabled title="Approval lands in Sprint 6">Reject</button>
-              </div>
+              {decision ? (
+                <p className="mono" style={{ color: "var(--text-2)" }}>{decision}</p>
+              ) : (
+                /* Neither button is the primary action. A gate where one choice
+                   is styled as the obvious one is not a gate. */
+                <div style={{ display: "flex", gap: "var(--s3)" }}>
+                  {(["approved", "rejected"] as const).map((choice) => (
+                    <button
+                      key={choice}
+                      onClick={async () => {
+                        if (!result?.run_id) return;
+                        const response = await fetch(`/api/runs/${result.run_id}/approve`, {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ decision: choice }),
+                        });
+                        const payload = await response.json().catch(() => ({}));
+                        setDecision(
+                          response.ok
+                            ? `${choice} — continuation run ${payload.continuation_run}. The gated run was not resumed.`
+                            : `could not record the decision: ${payload.error ?? response.status}`,
+                        );
+                      }}
+                    >
+                      {choice === "approved" ? "Approve" : "Reject"}
+                    </button>
+                  ))}
+                </div>
+              )}
             </>
           )}
         </section>
