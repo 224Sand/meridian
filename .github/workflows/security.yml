@@ -126,6 +126,12 @@ jobs:
             --exclude='**/reranker/**' --exclude='**/model/**' \
             --exclude-rule=python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query \
             --exclude-rule=python.lang.security.audit.formatted-sql-query.formatted-sql-query \
+            # automatic-memory-pinning is a PERFORMANCE rule (DataLoader
+            # pin_memory=True), not a security rule. It only benefits CUDA
+            # host->device transfer; train_reranker.py has no device selection
+            # and trains on CPU, where pinning allocates page-locked memory for
+            # no benefit. Excluded by id so the rule still applies elsewhere.
+            --exclude-rule=trailofbits.python.automatic-memory-pinning.automatic-memory-pinning \
             --error --skip-unknown-extensions .
 
   filesystem:
