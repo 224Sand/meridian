@@ -1,0 +1,218 @@
+{
+  "generatedAt": "2026-08-21T06:45:40.853Z",
+  "repo": "224Sand/sandscope",
+  "sha": "035016c",
+  "commits": 46,
+  "firstCommit": "2026-08-21T12:13:16+05:30",
+  "lastCommit": "2026-08-21T12:13:16+05:30",
+  "tests": {
+    "total": 345,
+    "files": 18
+  },
+  "lines": {
+    "agent": 5331,
+    "tests": 3141,
+    "web": 1818,
+    "tooling": 2073
+  },
+  "docs": {
+    "files": "38",
+    "lines": 2816
+  },
+  "requirements": {
+    "total": 58,
+    "done": 12,
+    "planned": 46
+  },
+  "defects": {
+    "total": 10,
+    "severityOne": 4,
+    "entries": [
+      {
+        "id": "D-001",
+        "found": "Sprint 3",
+        "sprint": "2",
+        "severity": "1",
+        "description": "Refusal gate marked 150/265 unanswerable questions answerable — a 56.6% false-answer rate reported at the Sprint 2 gate as zero",
+        "cause": "Test set too small and too easy, written by the implementer",
+        "status": "Fixed, guarded"
+      },
+      {
+        "id": "D-002",
+        "found": "Sprint 3",
+        "sprint": "3",
+        "severity": "2",
+        "description": "Evidence gate answered a value-demanding question the corpus never answers, scoring 8.85",
+        "cause": "Similarity signals cannot distinguish \"about this subject\" from \"answers this question\"",
+        "status": "Fixed, guarded"
+      },
+      {
+        "id": "D-003",
+        "found": "Sprint 3",
+        "sprint": "3",
+        "severity": "3",
+        "description": "Re-ranker experiment returned a null result that was two bugs: a NaN checkpoint and a saturated metric",
+        "cause": "NaN sorts as a no-op; document-level MRR was already 0.986",
+        "status": "Fixed, guarded"
+      },
+      {
+        "id": "D-004",
+        "found": "Sprint 4",
+        "sprint": "1",
+        "severity": "2",
+        "description": "Seed loader destroyed one embedding model's vectors when reloading under another",
+        "cause": "`chunk_embedding` cascades on chunk delete",
+        "status": "Fixed, guarded"
+      },
+      {
+        "id": "D-005",
+        "found": "Sprint 5",
+        "sprint": "4",
+        "severity": "2",
+        "description": "Retry loop re-sent an identical prompt, so it could never succeed",
+        "cause": "Design oversight: the edge existed, the feedback did not",
+        "status": "Fixed, guarded"
+      },
+      {
+        "id": "D-006",
+        "found": "Sprint 5",
+        "sprint": "4",
+        "severity": "1",
+        "description": "Semantic cache served the previous answer to a correction retry (0.886 similarity vs 0.60 threshold)",
+        "cause": "**Emergent interaction between two individually correct, individually measured components**",
+        "status": "Fixed, guarded"
+      },
+      {
+        "id": "D-007",
+        "found": "Sprint 5",
+        "sprint": "4",
+        "severity": "2",
+        "description": "`RUN_BUDGET_USD=0` killed every run mid-stream with an unhandled error",
+        "cause": "Fail-fast not applied to configuration",
+        "status": "Fixed, guarded"
+      },
+      {
+        "id": "D-008",
+        "found": "Sprint 5",
+        "sprint": "5",
+        "severity": "2",
+        "description": "CSP blocked React hydration in development; every button was inert HTML",
+        "cause": "A policy correct for production made development impossible",
+        "status": "Fixed, guarded"
+      },
+      {
+        "id": "D-009",
+        "found": "Sprint 5",
+        "sprint": "5",
+        "severity": "1",
+        "description": "The console displayed assessments the governance layer had refused to emit",
+        "cause": "Rendering ignored the run outcome",
+        "status": "Fixed, guarded"
+      },
+      {
+        "id": "D-010",
+        "found": "Sprint 5",
+        "sprint": "4",
+        "severity": "1",
+        "description": "Spend reservation priced against `providers[0]`, under-reserving 4x when failover reached a costlier provider",
+        "cause": "The guard assumed the cheapest candidate would serve",
+        "status": "Fixed, guarded"
+      }
+    ]
+  },
+  "adrs": [
+    {
+      "file": "0001-split-experience-layer-from-agent-runtime.md",
+      "title": "ADR-0001 — Split the experience layer from the agent runtime",
+      "status": "Accepted"
+    },
+    {
+      "file": "0002-product-name-as-build-time-configuration.md",
+      "title": "ADR-0002 — The product name is build-time configuration, not source",
+      "status": "Accepted"
+    },
+    {
+      "file": "0003-agent-runtime-on-hugging-face-spaces.md",
+      "title": "ADR-0003 — Host the agent runtime on Hugging Face Spaces (free CPU)",
+      "status": "Accepted"
+    },
+    {
+      "file": "0004-no-local-neural-embedding-model.md",
+      "title": "ADR-0004 — No local neural embedding model in the container",
+      "status": "Accepted"
+    },
+    {
+      "file": "0005-embedding-spaces-are-never-mixed.md",
+      "title": "ADR-0005 — Vectors from different embedding models are never compared",
+      "status": "Accepted"
+    },
+    {
+      "file": "0006-approval-nodes-are-terminal.md",
+      "title": "ADR-0006 — Human-approval nodes are terminal by construction",
+      "status": "Accepted"
+    },
+    {
+      "file": "0007-rate-limiting-fails-closed.md",
+      "title": "ADR-0007 — Rate limiting and the spend guard fail closed",
+      "status": "Accepted"
+    },
+    {
+      "file": "0008-similarity-thresholds-belong-to-the-embedder.md",
+      "title": "ADR-0008 — Similarity thresholds belong to the embedder, not to the cache",
+      "status": "Accepted"
+    },
+    {
+      "file": "0009-train-offline-serve-without-the-framework.md",
+      "title": "ADR-0009 — Models are trained offline and served without their training framework",
+      "status": "Accepted"
+    },
+    {
+      "file": "0010-training-labels-must-be-true-by-construction.md",
+      "title": "ADR-0010 — Training labels are true by construction, never model-generated",
+      "status": "Accepted"
+    },
+    {
+      "file": "0011-no-ann-index-below-5000-chunks.md",
+      "title": "ADR-0011 — No approximate-nearest-neighbour index until the corpus reaches ~5,000 chunks",
+      "status": "Accepted"
+    }
+  ],
+  "sprints": [
+    {
+      "number": 0,
+      "name": "Inception",
+      "release": "",
+      "velocity": "40 / 40 points committed and completed."
+    },
+    {
+      "number": 1,
+      "name": "Foundation",
+      "release": "0.1.0",
+      "velocity": "41 of 44 points."
+    },
+    {
+      "number": 2,
+      "name": "Agent Core I",
+      "release": "0.2.0",
+      "velocity": "36 of 39."
+    },
+    {
+      "number": 3,
+      "name": "Applied ML & Evaluation Science",
+      "release": "0.3.0",
+      "velocity": "40/40."
+    },
+    {
+      "number": 4,
+      "name": "Agent Core II",
+      "release": "0.4.0",
+      "velocity": "36/36."
+    },
+    {
+      "number": 5,
+      "name": "Console",
+      "release": "0.5.0",
+      "velocity": ""
+    }
+  ]
+}

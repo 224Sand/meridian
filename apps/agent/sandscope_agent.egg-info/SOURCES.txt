@@ -11,6 +11,7 @@ sandscope_agent/api/security.py
 sandscope_agent/db/__init__.py
 sandscope_agent/db/engine.py
 sandscope_agent/db/migrations.py
+sandscope_agent/db/runs.py
 sandscope_agent/db/seed_loader.py
 sandscope_agent/evaluation/__init__.py
 sandscope_agent/evaluation/classifier.py
@@ -56,6 +57,7 @@ tests/test_orchestrator.py
 tests/test_reranker.py
 tests/test_retrieval.py
 tests/test_router.py
+tests/test_runs_store.py
 tests/test_schema_integration.py
 tests/test_seed_loader.py
 tests/test_statistics.py
