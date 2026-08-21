@@ -1,0 +1,94 @@
+{
+  "generatedAt": "2026-08-21T16:15:39.362Z",
+  "sha": "5919959",
+  "providers": [
+    "groq",
+    "gemini",
+    "cerebras",
+    "openrouter",
+    "mistral"
+  ],
+  "adrs": [
+    {
+      "id": "0001",
+      "title": "Split the experience layer from the agent runtime",
+      "status": "Accepted",
+      "date": "2026-08-20",
+      "context": "The product needs a cinematic web experience and a stateful multi-agent runtime. Every credible implementation of the agent side — LangGraph, BM25, the evaluation harness, the local embedder — exists in Python. Every credible implementation of the experience side — React Server Components, streaming, the motion layer — exists in the JavaScript ecosystem. A single runtime forces one of the two to be reimplemented."
+    },
+    {
+      "id": "0002",
+      "title": "The product name is build-time configuration, not source",
+      "status": "Accepted",
+      "date": "2026-08-20",
+      "context": "The Product Owner requires the ability to change the product name late without a refactor. A name hardcoded across components, metadata, manifests and asset filenames turns a rename into a risky find-and-replace across the tree."
+    },
+    {
+      "id": "0003",
+      "title": "Host the agent runtime on Hugging Face Spaces (free CPU)",
+      "status": "Accepted",
+      "date": "2026-08-20",
+      "context": "NFR-002 requires zero infrastructure cost. Candidates evaluated: Google Cloud Run (generous always-free tier, ~1–3 s cold start, requires a card on file), Render free tier (no card, but sleeps after 15 minutes with a ~50 s cold start), Hugging Face Spaces free CPU (no card, 2 vCPU / 16 GB, sleeps only after prolonged inactivity), and Fly.io (no longer meaningfully free)."
+    },
+    {
+      "id": "0004",
+      "title": "No local neural embedding model in the container",
+      "status": "Accepted",
+      "date": "2026-08-20",
+      "context": "Dense retrieval needs embeddings. The default choice, `sentence-transformers`, pulls `torch` — 2–3 GB of image weight. Under ADR-0003 that inflates build time severely and risks the free tier's limits, for a corpus small enough that the quality difference is marginal."
+    },
+    {
+      "id": "0005",
+      "title": "Vectors from different embedding models are never compared",
+      "status": "Accepted",
+      "date": "2026-08-20",
+      "context": "ADR-0004 introduces two embedding sources. Storing both in one `vector` column and comparing them would produce a cosine similarity that is arithmetically valid and semantically meaningless. This class of bug is silent: retrieval keeps returning results, they are simply the wrong ones, and no error is ever raised."
+    },
+    {
+      "id": "0006",
+      "title": "Human-approval nodes are terminal by construction",
+      "status": "Accepted",
+      "date": "2026-08-20",
+      "context": "In prior work on a multi-agent system, a human-approval node had an outgoing edge into a registration node. The graph therefore proceeded to register the item regardless of what the reviewer actually answered. The approval step existed, rendered, collected a decision, and controlled nothing. It read as governance and functioned as a formality — the worst possible failure mode for a control, because it consumes the reviewer's attention while providing no protection."
+    },
+    {
+      "id": "0007",
+      "title": "Rate limiting and the spend guard fail closed",
+      "status": "Accepted",
+      "date": "2026-08-20",
+      "context": "The service is publicly reachable and calls paid-capable model providers. The common default — allow the request when the rate-limit store is unreachable — is chosen so that an infrastructure blip does not degrade user experience. Here that default converts a Redis outage into an unbounded-cost incident, and the endpoint into free LLM capacity for whoever finds it."
+    },
+    {
+      "id": "0008",
+      "title": "Similarity thresholds belong to the embedder, not to the cache",
+      "status": "Accepted",
+      "date": "2026-08-20",
+      "context": "The semantic cache was first written with a module-level `SIMILARITY_THRESHOLD = 0.86`, chosen because 0.86 is the sort of number that appears in semantic-cache examples."
+    },
+    {
+      "id": "0009",
+      "title": "Models are trained offline and served without their training framework",
+      "status": "Accepted",
+      "date": "2026-08-20",
+      "context": "Sprint 3 introduces trained models. ADR-0004 excluded `torch` from the runtime image because it is 2–3 GB, which breaks build times on the free tier and violates NFR-002. That reasoning still holds and is not being reversed."
+    },
+    {
+      "id": "0010",
+      "title": "Training labels are true by construction, never model-generated",
+      "status": "Accepted",
+      "date": "2026-08-20",
+      "context": "FR-028 needs a labelled dataset: questions paired with whether the corpus can answer them. The existing set is 22 questions written by hand, which is enough to falsify a threshold and nowhere near enough to fit a model."
+    },
+    {
+      "id": "0011",
+      "title": "No approximate-nearest-neighbour index until the corpus reaches ~5,000 chunks",
+      "status": "Accepted",
+      "date": "2026-08-20",
+      "context": "The schema defines an HNSW index on `chunk_embedding`. It was added because a vector column with an HNSW index is what a pgvector schema looks like, which is not a reason."
+    }
+  ],
+  "counts": {
+    "adrs": 11,
+    "accepted": 11
+  }
+}

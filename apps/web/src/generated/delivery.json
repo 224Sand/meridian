@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-08-21T07:09:52.798Z",
+  "generatedAt": "2026-08-21T16:15:39.212Z",
   "repo": "224Sand/sandscope",
-  "sha": "6e3dd1c",
-  "commits": 48,
-  "firstCommit": "2026-08-21T12:28:45+05:30",
-  "lastCommit": "2026-08-21T12:28:45+05:30",
+  "sha": "5919959",
+  "commits": 51,
+  "firstCommit": "2026-08-21T12:52:20+05:30",
+  "lastCommit": "2026-08-21T12:52:20+05:30",
   "tests": {
     "total": 345,
     "files": 18
@@ -12,12 +12,12 @@
   "lines": {
     "agent": 5331,
     "tests": 3141,
-    "web": 1818,
-    "tooling": 2073
+    "web": 2284,
+    "tooling": 2347
   },
   "docs": {
     "files": "38",
-    "lines": 2878
+    "lines": 2904
   },
   "requirements": {
     "total": 58,
@@ -25,7 +25,7 @@
     "planned": 46
   },
   "defects": {
-    "total": 10,
+    "total": 11,
     "severityOne": 4,
     "entries": [
       {
@@ -116,6 +116,15 @@
         "severity": "1",
         "description": "Spend reservation priced against `providers[0]`, under-reserving 4x when failover reached a costlier provider",
         "cause": "The guard assumed the cheapest candidate would serve",
+        "status": "Fixed, guarded"
+      },
+      {
+        "id": "D-011",
+        "found": "Sprint 6",
+        "sprint": "6",
+        "severity": "3",
+        "description": "A comment inside a backslash continuation truncated the Semgrep invocation; the scan ran without its exclusion, printed success, and the shell exited 127 on the orphaned flag",
+        "cause": "Shell semantics: a comment ends a continuation. Every visible signal pointed elsewhere",
         "status": "Fixed, guarded"
       }
     ]

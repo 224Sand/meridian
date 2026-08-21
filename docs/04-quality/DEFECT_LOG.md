@@ -20,6 +20,7 @@
 | D-008 | Sprint 5 | 5 | 2 | CSP blocked React hydration in development; every button was inert HTML | A policy correct for production made development impossible | Fixed, guarded |
 | D-009 | Sprint 5 | 5 | **1** | The console displayed assessments the governance layer had refused to emit | Rendering ignored the run outcome | Fixed, guarded |
 | D-010 | Sprint 5 | 4 | **1** | Spend reservation priced against `providers[0]`, under-reserving 4x when failover reached a costlier provider | The guard assumed the cheapest candidate would serve | Fixed, guarded |
+| D-011 | Sprint 6 | 6 | 3 | A comment inside a backslash continuation truncated the Semgrep invocation; the scan ran without its exclusion, printed success, and the shell exited 127 on the orphaned flag | Shell semantics: a comment ends a continuation. Every visible signal pointed elsewhere | Fixed, guarded |
 
 ## Where these were found, which is the finding
 
@@ -30,6 +31,7 @@
 | CI against a real database | 1 (D-004) |
 | Re-running a measurement after a change | 1 (D-003) |
 | Reading a trace the product renders about itself | 1 (D-010) |
+| CI reporting a failure whose visible cause was wrong | 1 (D-011) |
 | **Code review** | **0** |
 | **Unit tests written before the defect** | **0** |
 
@@ -47,7 +49,7 @@ A defect is logged here when found, before it is fixed, with its root cause
 class. A defect that reaches a deployed environment additionally gets a
 postmortem in `docs/06-operations/postmortems/`.
 
-## D-011 — A comment inside a shell continuation silently truncated the Semgrep scan
+## D-011 in detail — when every visible signal points the wrong way
 
 **Found:** 2026-08-21, CI (Security workflow), after the fix for D-010's sibling failures.
 **Severity:** Medium — the gate reported failure, but for a reason that pointed nowhere.

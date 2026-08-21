@@ -41,6 +41,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <span style={{ flex: 1 }} />
             {[
               ["/console", "Console"],
+              ["/architecture", "Architecture"],
+              ["/reliability", "Reliability"],
               ["/delivery", "Delivery"],
               [`https://github.com/${config.repo}`, "Source"],
             ].map(([href, label]) => (
