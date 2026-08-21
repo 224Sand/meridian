@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-08-21T16:24:24.000Z",
-  "sha": "bd97cd8",
+  "generatedAt": "2026-08-21T16:44:02.286Z",
+  "sha": "4ea1246",
   "thresholds": {
     "insufficientBelow": 0.74,
     "sufficientAbove": 10.38
@@ -90,8 +90,8 @@
     }
   },
   "defects": {
-    "total": 11,
-    "severity1": 4,
+    "total": 13,
+    "severity1": 5,
     "caughtByReview": 0,
     "rows": [
       {
@@ -181,6 +181,22 @@
         "severity": "3",
         "description": "A comment inside a backslash continuation truncated the Semgrep invocation; the scan ran without its exclusion, printed success, and the shell exited 127 on the orphaned flag",
         "rootCause": "Shell semantics: a comment ends a continuation. Every visible signal pointed elsewhere"
+      },
+      {
+        "id": "D-012",
+        "foundIn": "Sprint 7",
+        "sprint": "7",
+        "severity": "2",
+        "description": "No body-size limit on the run endpoint; a 200KB body reached the agent and returned 502 instead of being refused",
+        "rootCause": "Cost bounds were applied to spend and rate, but not to input length"
+      },
+      {
+        "id": "D-013",
+        "foundIn": "Sprint 7",
+        "sprint": "7",
+        "severity": "1",
+        "description": "The rate-limit pen test could not fail: it sent 8 requests against a limit of 20, and its pass condition accepted `all(c >= 400)`, so a service that was DOWN reported as correctly rate limited",
+        "rootCause": "A test written to pass rather than to detect"
       }
     ]
   },

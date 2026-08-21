@@ -14,6 +14,13 @@ import { NextResponse } from "next/server";
 import { agentServiceToken, agentServiceUrl } from "@/lib/env";
 import { check } from "@/lib/ratelimit";
 
+/** 16KB. The longest legitimate incident description in the corpus is under
+ *  4KB, so this leaves four times the headroom a real submission needs while
+ *  still being a bound worth having. 64KB was the first number chosen here and
+ *  it was too loose to mean anything: the pen test's 50KB probe sailed straight
+ *  through to a model call, which is the exact cost the limit exists to stop. */
+const MAX_BODY_BYTES = 16 * 1024;
+
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 /** A run must not outlive the platform's limit silently. */
@@ -42,9 +49,37 @@ export async function POST(request: Request): Promise<Response> {
     );
   }
 
+  // Body length is a cost bound, not a formality. Everything downstream --
+  // retrieval, embedding, the prompt itself -- scales with the text, so an
+  // unbounded body is an unbounded bill that the spend guard only catches after
+  // the work is under way. Refuse before parsing (P-7).
+  //
+  // Checked twice on purpose: Content-Length is free but a client controls it,
+  // so the parsed text is measured too.
+  const declared = Number(request.headers.get("content-length") ?? "0");
+  if (declared > MAX_BODY_BYTES) {
+    return NextResponse.json(
+      { error: "payload_too_large", detail: `body exceeds ${MAX_BODY_BYTES} bytes` },
+      { status: 413 },
+    );
+  }
+
+  let raw: string;
+  try {
+    raw = await request.text();
+  } catch {
+    return NextResponse.json({ error: "unreadable_body" }, { status: 400 });
+  }
+  if (new TextEncoder().encode(raw).length > MAX_BODY_BYTES) {
+    return NextResponse.json(
+      { error: "payload_too_large", detail: `body exceeds ${MAX_BODY_BYTES} bytes` },
+      { status: 413 },
+    );
+  }
+
   let payload: Body;
   try {
-    payload = (await request.json()) as Body;
+    payload = JSON.parse(raw) as Body;
   } catch {
     return NextResponse.json({ error: "invalid_json" }, { status: 400 });
   }

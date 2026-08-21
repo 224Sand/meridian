@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-08-21T16:24:23.863Z",
+  "generatedAt": "2026-08-21T16:44:02.150Z",
   "repo": "224Sand/sandscope",
-  "sha": "bd97cd8",
-  "commits": 52,
-  "firstCommit": "2026-08-21T21:46:03+05:30",
-  "lastCommit": "2026-08-21T21:46:03+05:30",
+  "sha": "4ea1246",
+  "commits": 53,
+  "firstCommit": "2026-08-21T21:54:46+05:30",
+  "lastCommit": "2026-08-21T21:54:46+05:30",
   "tests": {
     "total": 345,
     "files": 18
@@ -12,12 +12,12 @@
   "lines": {
     "agent": 5331,
     "tests": 3141,
-    "web": 2298,
-    "tooling": 2353
+    "web": 2330,
+    "tooling": 2398
   },
   "docs": {
     "files": "38",
-    "lines": 2904
+    "lines": 2907
   },
   "requirements": {
     "total": 58,
@@ -25,8 +25,8 @@
     "planned": 46
   },
   "defects": {
-    "total": 11,
-    "severityOne": 4,
+    "total": 13,
+    "severityOne": 5,
     "entries": [
       {
         "id": "D-001",
@@ -125,6 +125,24 @@
         "severity": "3",
         "description": "A comment inside a backslash continuation truncated the Semgrep invocation; the scan ran without its exclusion, printed success, and the shell exited 127 on the orphaned flag",
         "cause": "Shell semantics: a comment ends a continuation. Every visible signal pointed elsewhere",
+        "status": "Fixed, guarded"
+      },
+      {
+        "id": "D-012",
+        "found": "Sprint 7",
+        "sprint": "7",
+        "severity": "2",
+        "description": "No body-size limit on the run endpoint; a 200KB body reached the agent and returned 502 instead of being refused",
+        "cause": "Cost bounds were applied to spend and rate, but not to input length",
+        "status": "Fixed, guarded"
+      },
+      {
+        "id": "D-013",
+        "found": "Sprint 7",
+        "sprint": "7",
+        "severity": "1",
+        "description": "The rate-limit pen test could not fail: it sent 8 requests against a limit of 20, and its pass condition accepted `all(c >= 400)`, so a service that was DOWN reported as correctly rate limited",
+        "cause": "A test written to pass rather than to detect",
         "status": "Fixed, guarded"
       }
     ]
