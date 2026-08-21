@@ -111,26 +111,33 @@ jobs:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
       - name: Scan
         run: |
-          # Model artifacts are excluded: tokenizer.json is a 700KB BERT
-          # vocabulary that times out the AWS ruleset and matches
-          # public-s3-bucket on ordinary English words. Excluding a data file is
-          # not suppressing a finding about code.
-          # The SQL findings this raises were VERIFIED rather than silenced:
-          # every f-string SQL statement is in the ANN benchmark, uses a module
-          # constant for the table name, parameterises every value, and no
-          # request data reaches SQL anywhere in the codebase. The rule matches
-          # the pattern; the vulnerability is not present. Suppressed by id and
-          # path so the rule still applies everywhere else.
+          # Two exclusions, both verified rather than silenced.
+          #
+          # Excluded paths: tokenizer.json is a 700KB BERT vocabulary that times
+          # out the AWS ruleset and matches public-s3-bucket on ordinary English
+          # words. Excluding a data file is not suppressing a finding about code.
+          #
+          # SQL rules: every f-string SQL statement is in the ANN benchmark, uses
+          # a module constant for the table name, parameterises every value, and
+          # no request data reaches SQL anywhere in the codebase. The rule matches
+          # the pattern; the vulnerability is not present.
+          #
+          # automatic-memory-pinning is a PERFORMANCE rule (DataLoader
+          # pin_memory=True), not a security rule. It only pays off on CUDA
+          # host->device transfer; train_reranker.py has no device selection and
+          # trains on CPU, where pinning allocates page-locked memory for nothing.
+          #
+          # All three are excluded by id/path, so each rule still applies
+          # everywhere else in the tree.
+          #
+          # NOTE: comments must NOT appear between the backslash-continued flags
+          # below -- a comment terminates the continuation and the shell then
+          # tries to execute the next flag as a command (exit 127).
           semgrep scan \
             --config=p/default --config=p/security-audit --config=p/secrets \
             --exclude='**/reranker/**' --exclude='**/model/**' \
             --exclude-rule=python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query \
             --exclude-rule=python.lang.security.audit.formatted-sql-query.formatted-sql-query \
-            # automatic-memory-pinning is a PERFORMANCE rule (DataLoader
-            # pin_memory=True), not a security rule. It only benefits CUDA
-            # host->device transfer; train_reranker.py has no device selection
-            # and trains on CPU, where pinning allocates page-locked memory for
-            # no benefit. Excluded by id so the rule still applies elsewhere.
             --exclude-rule=trailofbits.python.automatic-memory-pinning.automatic-memory-pinning \
             --error --skip-unknown-extensions .
 

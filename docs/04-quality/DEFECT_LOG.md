@@ -46,3 +46,35 @@ own *correction* (0.886, yes) until the two are wired together and run.
 A defect is logged here when found, before it is fixed, with its root cause
 class. A defect that reaches a deployed environment additionally gets a
 postmortem in `docs/06-operations/postmortems/`.
+
+## D-011 — A comment inside a shell continuation silently truncated the Semgrep scan
+
+**Found:** 2026-08-21, CI (Security workflow), after the fix for D-010's sibling failures.
+**Severity:** Medium — the gate reported failure, but for a reason that pointed nowhere.
+
+**What happened.** Excluding a Semgrep rule meant adding a `--exclude-rule` flag to a
+backslash-continued `semgrep scan` invocation. The justification was written as comment
+lines directly above the new flag, inside the continuation. Bash ends a continuation at a
+comment, so the shell ran `semgrep scan` *without* the new flag, printed a complete and
+entirely plausible scan report, and then tried to execute
+`--exclude-rule=trailofbits...` as a program:
+
+    line 21: --exclude-rule=trailofbits...: not found
+    ##[error]Process completed with exit code 127
+
+**Why it cost a round trip.** Every visible signal was misleading. Semgrep printed
+`Scan completed successfully`, the finding it was supposed to suppress still appeared, and
+the exit code (127) belongs to the shell, not to the scanner. The obvious reading — "the
+exclusion flag doesn't work" — was wrong; the flag was never passed.
+
+**Fix.** Moved all commentary above the invocation so the continued flags are contiguous.
+
+**Guard.** `scripts/check-workflow-shell.mjs`, run in CI's governance job, parses every
+`run:` block in `.github/workflows` and fails on (a) a comment line following a line ending
+in `\`, and (b) any block that fails `bash -n`. It was verified against the broken file
+before being trusted: it reports `security.yml:129`, the exact line that produced the 127.
+
+**Class.** Same family as the silent no-op string replacements logged earlier: an edit that
+appears to have applied, produces confident output, and changes nothing. The standing
+response is unchanged — assert the anchor before writing, and prove the guard fails on the
+bug it claims to catch.

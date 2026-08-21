@@ -24,6 +24,8 @@ jobs:
         run: node scripts/check-config.mjs
       - name: Validate PDLC artifacts and traceability (AC-002)
         run: node scripts/check-docs.mjs
+      - name: Workflow shell check (guards D-011)
+        run: node scripts/check-workflow-shell.mjs
       - name: Secret scan (Definition of Done item 4)
         run: node scripts/check-secrets.mjs
 
