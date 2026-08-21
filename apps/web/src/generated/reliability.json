@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-08-21T16:44:02.286Z",
-  "sha": "4ea1246",
+  "generatedAt": "2026-08-21T16:50:29.087Z",
+  "sha": "c2e1689",
   "thresholds": {
     "insufficientBelow": 0.74,
     "sufficientAbove": 10.38
@@ -90,7 +90,7 @@
     }
   },
   "defects": {
-    "total": 13,
+    "total": 14,
     "severity1": 5,
     "caughtByReview": 0,
     "rows": [
@@ -197,6 +197,14 @@
         "severity": "1",
         "description": "The rate-limit pen test could not fail: it sent 8 requests against a limit of 20, and its pass condition accepted `all(c >= 400)`, so a service that was DOWN reported as correctly rate limited",
         "rootCause": "A test written to pass rather than to detect"
+      },
+      {
+        "id": "D-014",
+        "foundIn": "Sprint 7",
+        "sprint": "7",
+        "severity": "2",
+        "description": "Traceability statuses drifted in both directions: 4 rows used statuses the legend never defined (`Done (design)`/`(gate)`/`(decision)`) which the delivery page counted as done, and 1 row sat at `Planned` while its test had passed for four sprints",
+        "rootCause": "A status column maintained by hand, rendered publicly as fact"
       }
     ]
   },

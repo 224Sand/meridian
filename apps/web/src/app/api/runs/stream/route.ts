@@ -16,10 +16,16 @@ import { check } from "@/lib/ratelimit";
 
 /** 16KB. The longest legitimate incident description in the corpus is under
  *  4KB, so this leaves four times the headroom a real submission needs while
- *  still being a bound worth having. 64KB was the first number chosen here and
- *  it was too loose to mean anything: the pen test's 50KB probe sailed straight
- *  through to a model call, which is the exact cost the limit exists to stop. */
-const MAX_BODY_BYTES = 16 * 1024;
+ *  still being a bound worth having.
+ *
+ *  Two earlier numbers were wrong in the same direction. 64KB let the pen
+ *  test's own 50KB probe reach a model call. 16KB still admitted bodies the
+ *  runtime refuses outright -- it caps `body` at 4000 characters -- so the
+ *  edge forwarded requests that could only fail, spending a round trip and a
+ *  rate-limit token to learn what it already knew. 8KB holds one runtime-sized
+ *  payload plus envelope. test_contract_bff_to_runtime asserts the relation
+ *  rather than the constant, so it survives either side moving. */
+const MAX_BODY_BYTES = 8 * 1024;
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";

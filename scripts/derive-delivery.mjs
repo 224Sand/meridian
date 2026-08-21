@@ -115,7 +115,11 @@ function sprints() {
 }
 
 const commits = git("rev-list", "--count", "HEAD");
-const firstCommit = git("log", "--reverse", "--format=%aI", "--max-count=1");
+// `git log --reverse --max-count=1` does NOT give the first commit: the limit
+// is applied before the reversal, so it returns the newest commit and reverses
+// a list of one. It reported firstCommit === lastCommit, which made the project
+// look like it happened in a single instant. Ask for the root commit instead.
+const firstCommit = git("log", "-1", "--format=%aI", git("rev-list", "--max-parents=0", "HEAD").split("\n")[0]);
 const lastCommit = git("log", "-1", "--format=%aI");
 const sha = git("rev-parse", "--short", "HEAD");
 

@@ -23,6 +23,7 @@
 | D-011 | Sprint 6 | 6 | 3 | A comment inside a backslash continuation truncated the Semgrep invocation; the scan ran without its exclusion, printed success, and the shell exited 127 on the orphaned flag | Shell semantics: a comment ends a continuation. Every visible signal pointed elsewhere | Fixed, guarded |
 | D-012 | Sprint 7 | 7 | 2 | No body-size limit on the run endpoint; a 200KB body reached the agent and returned 502 instead of being refused | Cost bounds were applied to spend and rate, but not to input length | Fixed, guarded |
 | D-013 | Sprint 7 | 7 | **1** | The rate-limit pen test could not fail: it sent 8 requests against a limit of 20, and its pass condition accepted `all(c >= 400)`, so a service that was DOWN reported as correctly rate limited | A test written to pass rather than to detect | Fixed, guarded |
+| D-014 | Sprint 7 | 7 | 2 | Traceability statuses drifted in both directions: 4 rows used statuses the legend never defined (`Done (design)`/`(gate)`/`(decision)`) which the delivery page counted as done, and 1 row sat at `Planned` while its test had passed for four sprints | A status column maintained by hand, rendered publicly as fact | Fixed, guarded |
 
 ## Where these were found, which is the finding
 
@@ -35,6 +36,7 @@
 | Reading a trace the product renders about itself | 1 (D-010) |
 | CI reporting a failure whose visible cause was wrong | 1 (D-011) |
 | Running the security suite against a live system | 2 (D-012, D-013) |
+| Deriving a public number instead of trusting the document | 1 (D-014) |
 | **Code review** | **0** |
 | **Unit tests written before the defect** | **0** |
 

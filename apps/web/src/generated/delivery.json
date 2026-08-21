@@ -1,31 +1,31 @@
 {
-  "generatedAt": "2026-08-21T16:44:02.150Z",
+  "generatedAt": "2026-08-21T16:50:28.964Z",
   "repo": "224Sand/sandscope",
-  "sha": "4ea1246",
-  "commits": 53,
-  "firstCommit": "2026-08-21T21:54:46+05:30",
-  "lastCommit": "2026-08-21T21:54:46+05:30",
+  "sha": "c2e1689",
+  "commits": 54,
+  "firstCommit": "2026-08-20T04:21:57+05:30",
+  "lastCommit": "2026-08-21T22:14:11+05:30",
   "tests": {
-    "total": 345,
-    "files": 18
+    "total": 351,
+    "files": 19
   },
   "lines": {
     "agent": 5331,
-    "tests": 3141,
-    "web": 2330,
-    "tooling": 2398
+    "tests": 3317,
+    "web": 2336,
+    "tooling": 2485
   },
   "docs": {
     "files": "38",
-    "lines": 2907
+    "lines": 2916
   },
   "requirements": {
     "total": 58,
-    "done": 12,
-    "planned": 46
+    "done": 13,
+    "planned": 45
   },
   "defects": {
-    "total": 13,
+    "total": 14,
     "severityOne": 5,
     "entries": [
       {
@@ -143,6 +143,15 @@
         "severity": "1",
         "description": "The rate-limit pen test could not fail: it sent 8 requests against a limit of 20, and its pass condition accepted `all(c >= 400)`, so a service that was DOWN reported as correctly rate limited",
         "cause": "A test written to pass rather than to detect",
+        "status": "Fixed, guarded"
+      },
+      {
+        "id": "D-014",
+        "found": "Sprint 7",
+        "sprint": "7",
+        "severity": "2",
+        "description": "Traceability statuses drifted in both directions: 4 rows used statuses the legend never defined (`Done (design)`/`(gate)`/`(decision)`) which the delivery page counted as done, and 1 row sat at `Planned` while its test had passed for four sprints",
+        "cause": "A status column maintained by hand, rendered publicly as fact",
         "status": "Fixed, guarded"
       }
     ]

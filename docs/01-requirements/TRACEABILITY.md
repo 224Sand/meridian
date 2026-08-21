@@ -16,16 +16,24 @@ delivery surface (AC-002).
 
 `Planned` · specified, not yet built  ·  `Building` · in the active sprint  ·  `Done` · implemented, test green in CI
 
+**Enforced, not asserted.** `scripts/check-traceability.mjs` fails the build if a
+row claims `Done` while the test it names cannot be found in the repository.
+Three rows were wrong when that check was first written: two claimed
+`Done (design)` — a status this legend does not define, which the delivery page
+nonetheless counted as done — and one claimed `Planned` for work whose test had
+been passing for four sprints. A status column maintained by hand drifts in both
+directions.
+
 ---
 
 | ID | Requirement | Story | Test | Sprint | Status |
 |---|---|---|---|---|---|
 | VIS-001 | Reads as production-grade engineering to a senior reviewer | S6-REVIEW | `e2e/reviewer_journey.spec.ts` | 7 | Planned |
 | PR-001 | Named-role PDLC with explicit sign-off gates | S0-01 | `check-docs.mjs` (artifact + gate presence) | 0 | Done |
-| AC-002 | Every PDLC claim verifiable; no simulated delivery metrics | S0-01, S5-DELIV | `check-docs.mjs`, `test_delivery_reads_live_github` | 0,5 | Done (gate) |
-| AC-001 | Experience layer separated from agent runtime | S0-04 | `test_contract_bff_to_runtime` | 0,2 | Done (design) |
+| AC-002 | Every PDLC claim verifiable; no simulated delivery metrics | S0-01, S5-DELIV | `test_delivery_reads_live_github` | 0,5,7 | Done |
+| AC-001 | Experience layer separated from agent runtime | S0-04 | `test_bff_sends_exactly_the_fields_the_runtime_accepts` | 0,2,7 | Done |
 | NFR-001 | Effort directed at delivery, not deliberation | S0-01 | Sprint velocity vs. committed points | 0 | Done |
-| NFR-002 | Zero infrastructure cost | S0-04 | `test_no_paid_service_in_deploy_manifest` | 0,6 | Done (design) |
+| NFR-002 | Zero infrastructure cost | S0-04 | `test_no_paid_service_in_deploy_manifest` | 0,6,7 | Done |
 | NFR-003 | First meaningful paint under 2.5s on cold 4G | S4-PERF | Lighthouse budget assertion in CI | 5 | Planned |
 | NFR-004 | Public endpoint survives untrusted traffic without unbounded cost | S2-GUARD | `test_rate_limiter_denies_when_store_unreachable` | 2 | Planned |
 | NFR-005 | Runtime holds no persistent local state | S1-DATA | `test_no_local_filesystem_writes` | 1 | Planned |
@@ -36,11 +44,11 @@ delivery surface (AC-002).
 | SD-003 | No job-application or resume tooling | S0-03 | PRD §8 scope exclusion, reviewed at each gate | 0 | Done |
 | SD-004 | Domain is agent reliability; incident triage is the workload | S0-03 | PO acceptance | 0 | Done |
 | CR-001 | Resume content restrictions do not apply | S0-02 | BRD §7 scope statement | 0 | Done |
-| INF-001 | HF Spaces runtime, Vercel experience layer | S0-05 | ADR-0003; `test_container_binds_7860` | 0,6 | Done (decision) |
+| INF-001 | HF Spaces runtime, Vercel experience layer | S0-05 | `test_container_binds_7860` | 0,6,7 | Done |
 | OPS-001 | Host disk reclamation authorised | S0-09 | Pre-build disk check recorded in sprint log | 0 | Done |
 | BR-001 | Triage an incident, produce a hypothesis with cited evidence | S3-TRIAGE | `test_every_emitted_claim_carries_a_citation` | 2,4 | Planned |
 | BR-002 | Demonstrate PDLC/SDLC/CI-CD/Agile/Scrum verifiably | S5-DELIV | `test_delivery_reads_live_github` | 6 | Planned |
-| BR-003 | Continue operating when a provider fails or rate-limits | S2-ROUTER | `test_workflow_completes_when_first_provider_fails` | 2 | Planned |
+| BR-003 | Continue operating when a provider fails or rate-limits | S2-ROUTER | `test_workflow_completes_when_first_provider_fails` | 2 | Done |
 | BR-004 | Refuse when evidence does not support an answer | S2-RAG | `test_unanswerable_questions_are_refused` | 2 | Planned |
 | BR-005 | Record a full, inspectable execution trace per run | S3-TRACE | `test_span_tree_covers_every_node` | 2,4 | Planned |
 | BR-006 | Block high-risk actions pending human approval | S2-GOV | `test_approval_node_has_no_outgoing_edges` | 2 | Planned |
