@@ -49,3 +49,4 @@ htmlcov/
 # Evaluation output is regenerated on every CI run and uploaded as an artifact.
 apps/agent/reports/
 apps/web/.env.local
+apps/web/public/media/.*.source.mp4
