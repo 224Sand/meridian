@@ -1,23 +1,23 @@
 {
-  "generatedAt": "2026-08-21T17:38:26.896Z",
+  "generatedAt": "2026-08-21T18:41:58.026Z",
   "repo": "224Sand/sandscope",
-  "sha": "eabe499",
-  "commits": 56,
+  "sha": "37ed515",
+  "commits": 57,
   "firstCommit": "2026-08-20T04:21:57+05:30",
-  "lastCommit": "2026-08-21T22:25:07+05:30",
+  "lastCommit": "2026-08-21T23:09:07+05:30",
   "tests": {
     "total": 357,
     "files": 20
   },
   "lines": {
     "agent": 5331,
-    "tests": 3427,
+    "tests": 3440,
     "web": 2336,
     "tooling": 2653
   },
   "docs": {
-    "files": "43",
-    "lines": 3185
+    "files": "44",
+    "lines": 3270
   },
   "requirements": {
     "total": 58,
@@ -25,7 +25,7 @@
     "planned": 45
   },
   "defects": {
-    "total": 16,
+    "total": 17,
     "severityOne": 5,
     "entries": [
       {
@@ -171,6 +171,15 @@
         "description": "Sprints 6 and 7 were worked and shipped with no planning ceremony and no plan document; the sprint numbers existed only in defect-log entries, and a Sprint 5 retrospective commitment to raise exactly this was never honoured",
         "cause": "Governance applied to the product but not to the process; the control relied on someone remembering",
         "status": "Fixed, guarded"
+      },
+      {
+        "id": "D-017",
+        "found": "Sprint 8",
+        "sprint": "8",
+        "severity": "2",
+        "description": "ADR-0003 placed the agent runtime on Hugging Face Docker Spaces \"because it is free\"; Docker Spaces are PRO-only, so three sprints of deployment work targeted a platform that cannot host it at $0",
+        "cause": "A pricing claim recorded in an ADR without ever being read from the pricing page",
+        "status": "Fixed, guarded"
       }
     ]
   },
@@ -188,7 +197,7 @@
     {
       "file": "0003-agent-runtime-on-hugging-face-spaces.md",
       "title": "ADR-0003 — Host the agent runtime on Hugging Face Spaces (free CPU)",
-      "status": "Accepted"
+      "status": "unknown"
     },
     {
       "file": "0004-no-local-neural-embedding-model.md",
@@ -228,6 +237,11 @@
     {
       "file": "0011-no-ann-index-below-5000-chunks.md",
       "title": "ADR-0011 — No approximate-nearest-neighbour index until the corpus reaches ~5,000 chunks",
+      "status": "Accepted"
+    },
+    {
+      "file": "0012-agent-runtime-on-northflank.md",
+      "title": "ADR-0012 — The agent runtime runs on Northflank, not Hugging Face Spaces",
       "status": "Accepted"
     }
   ],

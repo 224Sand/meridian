@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-08-21T17:38:27.024Z",
-  "sha": "eabe499",
+  "generatedAt": "2026-08-21T18:41:58.128Z",
+  "sha": "37ed515",
   "providers": [
     "groq",
     "gemini",
@@ -26,7 +26,7 @@
     {
       "id": "0003",
       "title": "Host the agent runtime on Hugging Face Spaces (free CPU)",
-      "status": "Accepted",
+      "status": "Unknown",
       "date": "2026-08-20",
       "context": "NFR-002 requires zero infrastructure cost. Candidates evaluated: Google Cloud Run (generous always-free tier, ~1–3 s cold start, requires a card on file), Render free tier (no card, but sleeps after 15 minutes with a ~50 s cold start), Hugging Face Spaces free CPU (no card, 2 vCPU / 16 GB, sleeps only after prolonged inactivity), and Fly.io (no longer meaningfully free)."
     },
@@ -85,10 +85,17 @@
       "status": "Accepted",
       "date": "2026-08-20",
       "context": "The schema defines an HNSW index on `chunk_embedding`. It was added because a vector column with an HNSW index is what a pgvector schema looks like, which is not a reason."
+    },
+    {
+      "id": "0012",
+      "title": "The agent runtime runs on Northflank, not Hugging Face Spaces",
+      "status": "Accepted",
+      "date": "2026-08-22",
+      "context": "ADR-0003 placed the agent runtime on Hugging Face Spaces using the Docker SDK, on the stated grounds that it was free. That was true when the decision was written and is no longer true: Hugging Face now requires a PRO subscription for Docker and Gradio Spaces, and only Static Spaces remain free. A Static Space cannot run FastAPI, so the decision did not merely become expensive — it became impossible at $0."
     }
   ],
   "counts": {
-    "adrs": 11,
+    "adrs": 12,
     "accepted": 11
   }
 }

@@ -47,9 +47,11 @@ tests/test_adapters.py
 tests/test_api.py
 tests/test_cache.py
 tests/test_classifier.py
+tests/test_contracts_and_cost.py
 tests/test_dataset.py
 tests/test_estate.py
 tests/test_evidence.py
+tests/test_guards_fail_on_bad_input.py
 tests/test_harness.py
 tests/test_incidents.py
 tests/test_migrations.py

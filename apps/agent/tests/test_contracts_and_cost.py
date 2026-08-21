@@ -91,8 +91,8 @@ class ZeroInfrastructureCost(unittest.TestCase):
     #: Services the project is allowed to depend on, each free at this scale.
     #: Adding a name here is a deliberate act, which is the point of the list.
     PERMITTED: ClassVar[set[str]] = {
-        "huggingface.co",
-        "hf.space",
+        "code.run",
+        "northflank.com",
         "vercel.app",
         "vercel.com",
         "neon.tech",
@@ -116,8 +116,7 @@ class ZeroInfrastructureCost(unittest.TestCase):
     def _manifests(self) -> list[Path]:
         paths = [
             ROOT / "vercel.json",
-            ROOT / "deploy/space/Dockerfile",
-            ROOT / "deploy/space/README.md",
+            ROOT / "deploy/Dockerfile",
         ]
         paths += sorted((ROOT / ".github/workflows").glob("*.yml"))
         present = [p for p in paths if p.exists()]
@@ -158,7 +157,7 @@ class DeploymentClaims(unittest.TestCase):
 
     def test_container_binds_7860(self) -> None:
         """INF-001. Spaces routes to one port; binding another serves nothing."""
-        dockerfile = (ROOT / "deploy/space/Dockerfile").read_text()
+        dockerfile = (ROOT / "deploy/Dockerfile").read_text()
         self.assertIn("EXPOSE 7860", dockerfile)
         self.assertRegex(
             dockerfile,
@@ -170,11 +169,16 @@ class DeploymentClaims(unittest.TestCase):
             r"--host 0\.0\.0\.0",
             "binding to 127.0.0.1 inside a container is unreachable from outside it",
         )
-        readme = (ROOT / "deploy/space/README.md").read_text()
-        self.assertIn(
-            "app_port: 7860",
-            readme,
-            "the Space manifest must declare the same port the container binds",
+        # There is no repo-side port manifest any more. Hugging Face declared the
+        # port in the Space README; Northflank sets it in service configuration,
+        # which lives outside the repository. The Dockerfile is therefore the
+        # only artifact here that determines the port, so it is asserted in full
+        # -- EXPOSE, the bind address and the default -- and the platform side is
+        # verified against the DEPLOYED healthcheck instead (Sprint 8, DoD 10).
+        self.assertNotIn(
+            "7861",
+            dockerfile,
+            "a second port in the Dockerfile would make the contract ambiguous",
         )
 
     def test_delivery_reads_live_github(self) -> None:

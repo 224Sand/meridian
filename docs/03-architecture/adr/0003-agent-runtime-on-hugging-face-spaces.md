@@ -1,6 +1,11 @@
 # ADR-0003 — Host the agent runtime on Hugging Face Spaces (free CPU)
 
-**Status:** Accepted · **Date:** 2026-08-20 · **Deciders:** Executive Sponsor (NFR-002, INF-001)
+**Status:** **Superseded by [ADR-0012](0012-agent-runtime-on-northflank.md)** (2026-08-22) · **Date:** 2026-08-20 · **Deciders:** Executive Sponsor (NFR-002, INF-001)
+
+> **Superseded.** Hugging Face moved Docker Spaces behind a PRO subscription;
+> only Static Spaces remain free, and a Static Space cannot run FastAPI. The
+> pricing claim in this ADR was never verified against the pricing page — that
+> omission, not the choice itself, is the defect. See ADR-0012.
 
 ## Context
 NFR-002 requires zero infrastructure cost. Candidates evaluated: Google Cloud Run

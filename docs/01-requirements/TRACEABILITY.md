@@ -44,7 +44,7 @@ directions.
 | SD-003 | No job-application or resume tooling | S0-03 | PRD §8 scope exclusion, reviewed at each gate | 0 | Done |
 | SD-004 | Domain is agent reliability; incident triage is the workload | S0-03 | PO acceptance | 0 | Done |
 | CR-001 | Resume content restrictions do not apply | S0-02 | BRD §7 scope statement | 0 | Done |
-| INF-001 | HF Spaces runtime, Vercel experience layer | S0-05 | `test_container_binds_7860` | 0,6,7 | Done |
+| INF-001 | Containerised runtime, Vercel experience layer | S0-05 | `test_container_binds_7860` | 0,6,7,8 | Done |
 | OPS-001 | Host disk reclamation authorised | S0-09 | Pre-build disk check recorded in sprint log | 0 | Done |
 | BR-001 | Triage an incident, produce a hypothesis with cited evidence | S3-TRIAGE | `test_every_emitted_claim_carries_a_citation` | 2,4 | Planned |
 | BR-002 | Demonstrate PDLC/SDLC/CI-CD/Agile/Scrum verifiably | S5-DELIV | `test_delivery_reads_live_github` | 6 | Planned |

@@ -201,3 +201,15 @@ rendered on `/delivery`. A requirement with no test is a defect in the process.
 | Sandeep Chavan | Product Owner | ☑ Signed off 2026-08-20 |
 
 *Charter signed off. Sprint 0 opened 2026-08-20. Gate depth elected: FULL ARTIFACT REVIEW.*
+
+## Verifying external claims
+
+An ADR that depends on a third party's pricing, quota or free tier must name the
+page the claim was read from and the date it was read. A claim recorded without
+that is not a decision record, it is a memory.
+
+This exists because ADR-0003 placed the agent runtime on Hugging Face Spaces
+"because it is free", was never checked against the pricing page, and had already
+carried three sprints of deployment work by the time Docker Spaces turned out to
+require a paid plan. The cost was not the subscription — it was rebuilding the
+deployment decision at the release gate.

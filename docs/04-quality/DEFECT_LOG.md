@@ -26,6 +26,7 @@
 | D-014 | Sprint 7 | 7 | 2 | Traceability statuses drifted in both directions: 4 rows used statuses the legend never defined (`Done (design)`/`(gate)`/`(decision)`) which the delivery page counted as done, and 1 row sat at `Planned` while its test had passed for four sprints | A status column maintained by hand, rendered publicly as fact | Fixed, guarded |
 | D-015 | Sprint 7 | 7 | 3 | The first README checker could not fail: it searched for each figure as a substring of the whole file, so changing `Commits \| 54` to 99 still passed because "54" appears in "54% of questions" | A guard written to confirm rather than to detect — caught only by deliberately corrupting a value | Fixed, guarded |
 | D-016 | Sprint 7 | 7 | 2 | Sprints 6 and 7 were worked and shipped with no planning ceremony and no plan document; the sprint numbers existed only in defect-log entries, and a Sprint 5 retrospective commitment to raise exactly this was never honoured | Governance applied to the product but not to the process; the control relied on someone remembering | Fixed, guarded |
+| D-017 | Sprint 8 | 8 | 2 | ADR-0003 placed the agent runtime on Hugging Face Docker Spaces "because it is free"; Docker Spaces are PRO-only, so three sprints of deployment work targeted a platform that cannot host it at $0 | A pricing claim recorded in an ADR without ever being read from the pricing page | Fixed, guarded |
 
 ## Where these were found, which is the finding
 
@@ -41,6 +42,7 @@
 | Deriving a public number instead of trusting the document | 1 (D-014) |
 | Deliberately breaking a guard to see whether it notices | 1 (D-015) |
 | The Product Owner asking a direct question | **1** (D-016) |
+| Reaching the deploy and finding the platform had changed | 1 (D-017) |
 | **Code review** | **0** |
 | **Unit tests written before the defect** | **0** |
 

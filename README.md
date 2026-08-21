@@ -13,7 +13,7 @@ knowing when not to.
 | | |
 |---|---|
 | **Experience layer** | Next.js on Vercel — SSE console, delivery record, reliability and architecture surfaces |
-| **Agent runtime** | FastAPI + LangGraph on Hugging Face Spaces |
+| **Agent runtime** | FastAPI + LangGraph on Northflank (London) |
 | **Data plane** | Neon Postgres + pgvector · Upstash Redis + Vector — all Ireland |
 | **Models** | Trained offline, served as ONNX. No training framework in the serving image. |
 | **Cost** | $0. Every dependency has a free tier, and a test asserts it. |
@@ -107,8 +107,8 @@ defect count, and including the numbers in this README.
 |---|---|
 | Tests | 357 across 20 files |
 | Requirements | 58, of which 13 `Done` and each names a test that exists |
-| Defects logged | 16, of which 5 severity 1 |
-| ADRs | 11 |
+| Defects logged | 17, of which 5 severity 1 |
+| ADRs | 12 |
 
 **Not one defect was caught by code review, and not one by a unit test written
 before it.** Every single one was caught by *executing* something — the
@@ -141,8 +141,10 @@ cd apps/agent && python -m venv .venv && .venv/bin/pip install -e ".[dev]"
 cd apps/web && npm ci && npm run dev
 ```
 
-Deployment manifests live in [`deploy/space/`](deploy/space) (Hugging Face) and
-[`vercel.json`](vercel.json).
+Deployment manifests live in [`deploy/Dockerfile`](deploy/Dockerfile) (Northflank)
+and [`vercel.json`](vercel.json). The runtime moved off Hugging Face Spaces when
+Docker Spaces went PRO-only — see
+[ADR-0012](docs/03-architecture/adr/0012-agent-runtime-on-northflank.md).
 
 ## Honest limitations
 
