@@ -3,18 +3,42 @@ updates:
   - package-ecosystem: "pip"
     directory: "/apps/agent"
     schedule: { interval: "weekly" }
+    # A newly published version is the one most likely to be a compromised
+    # release: a hijacked package is typically caught within days. Waiting
+    # before opening the PR costs a few days of currency and removes the window
+    # where an attacker's version is the one Dependabot proposes.
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 5
     labels: ["security", "dependencies"]
   - package-ecosystem: "npm"
     directory: "/apps/web"
     schedule: { interval: "weekly" }
+    # A newly published version is the one most likely to be a compromised
+    # release: a hijacked package is typically caught within days. Waiting
+    # before opening the PR costs a few days of currency and removes the window
+    # where an attacker's version is the one Dependabot proposes.
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 5
     labels: ["security", "dependencies"]
   - package-ecosystem: "npm"
     directory: "/"
     schedule: { interval: "weekly" }
+    # A newly published version is the one most likely to be a compromised
+    # release: a hijacked package is typically caught within days. Waiting
+    # before opening the PR costs a few days of currency and removes the window
+    # where an attacker's version is the one Dependabot proposes.
+    cooldown:
+      default-days: 7
     labels: ["security", "dependencies"]
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule: { interval: "weekly" }
+    # A newly published version is the one most likely to be a compromised
+    # release: a hijacked package is typically caught within days. Waiting
+    # before opening the PR costs a few days of currency and removes the window
+    # where an attacker's version is the one Dependabot proposes.
+    cooldown:
+      default-days: 7
     labels: ["security", "ci"]

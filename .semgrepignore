@@ -1,0 +1,11 @@
+# Model artifacts. tokenizer.json is a 700KB BERT vocabulary: it times out the
+# AWS ruleset and matches public-s3-bucket on ordinary English words. Excluding
+# a data file is not suppressing a finding about code.
+apps/agent/sandscope_agent/retrieval/reranker/
+apps/agent/sandscope_agent/evaluation/model/
+
+# Generated and vendored.
+.next/
+node_modules/
+.venv/
+.venv-train/

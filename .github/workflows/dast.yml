@@ -25,9 +25,9 @@ jobs:
     name: OWASP ZAP baseline
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
       - name: Baseline scan
-        uses: zaproxy/action-baseline@v0.14.0
+        uses: zaproxy/action-baseline@de8ad967d3548d44ef623df22cf95c3b0baf8b25 # v0.15.0
         with:
           target: ${{ github.event.inputs.target || 'https://sandscope.vercel.app' }}
           rules_file_name: .zap/rules.tsv
