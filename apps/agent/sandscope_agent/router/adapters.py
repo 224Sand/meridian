@@ -69,8 +69,13 @@ OPENAI_COMPATIBLE: tuple[OpenAICompatibleConfig, ...] = (
         name="groq",
         base_url="https://api.groq.com/openai/v1/chat/completions",
         api_key_env="GROQ_API_KEY",
-        fast_model="llama-3.1-8b-instant",
-        large_model="llama-3.3-70b-versatile",
+        # Groq withdrew the Llama chat models; only prompt-guard remains under
+        # that name and it is not a chat model. gpt-oss returns its chain of
+        # thought in a separate `reasoning` field that is billed against
+        # max_tokens BEFORE any `content` is emitted -- a tight ceiling yields
+        # a 200 with an empty answer. See MAX_TOKENS in orchestrator/graph.py.
+        fast_model="openai/gpt-oss-20b",
+        large_model="openai/gpt-oss-120b",
         min_call_gap_seconds=1.0,
     ),
     OpenAICompatibleConfig(
@@ -196,8 +201,9 @@ class OpenAICompatibleProvider:
 class GeminiProvider:
     """Gemini speaks its own request shape and takes its key in the URL query."""
 
-    fast_model: str = "gemini-2.0-flash"
-    large_model: str = "gemini-2.0-flash"
+    #: gemini-2.0-flash was retired. 3.6-flash is served on v1, not v1beta.
+    fast_model: str = "gemini-3.6-flash"
+    large_model: str = "gemini-3.6-flash"
     min_call_gap_seconds: float = 1.0
     client: httpx.Client | None = None
 
@@ -241,7 +247,9 @@ class GeminiProvider:
         if system:
             payload["systemInstruction"] = {"parts": [{"text": "\n\n".join(system)}]}
 
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+        # v1, not v1beta: gemini-3.6-flash is absent from the v1beta model list
+        # and returns 404 there.
+        url = f"https://generativelanguage.googleapis.com/v1/models/{model}:generateContent"
         try:
             response = self._http().post(url, headers={"x-goog-api-key": key}, json=payload)
         except httpx.HTTPError as error:

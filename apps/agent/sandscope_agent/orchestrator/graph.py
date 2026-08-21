@@ -50,7 +50,12 @@ from sandscope_agent.router.router import Router
 #: Uncited-claim retries before the run escalates rather than emitting.
 MAX_VERIFY_ATTEMPTS = 3
 #: Ceiling on a single response. Also what the spend guard reserves against.
-MAX_TOKENS = 700
+#: Raised from 700 when the provider models changed. Reasoning models -- both
+#: gpt-oss and Gemini 3 -- spend output tokens on internal thought before
+#: emitting content, and that spend counts against this ceiling. At 700 a
+#: request returns HTTP 200 with an EMPTY answer, which is the worst possible
+#: failure shape: it looks like a working call that produced nothing.
+MAX_TOKENS = 2000
 
 
 class RunState(TypedDict, total=False):
