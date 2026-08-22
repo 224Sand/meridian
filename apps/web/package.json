@@ -8,8 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "prebuild": "node ../../scripts/derive-delivery.mjs && node ../../scripts/derive-surfaces.mjs",
-    "predev": "node ../../scripts/derive-delivery.mjs && node ../../scripts/derive-surfaces.mjs"
+    "prebuild": "node scripts/prebuild.mjs",
+    "predev": "node scripts/prebuild.mjs"
   },
   "dependencies": {
     "@upstash/ratelimit": "^2.0.0",
