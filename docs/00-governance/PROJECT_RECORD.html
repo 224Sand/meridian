@@ -1,0 +1,550 @@
+<title>SandScope Project Record</title>
+<style>
+  :root {
+    --ground: #000000;
+    --surface: #0b0b0d;
+    --surface-2: #141417;
+    --line: #26262b;
+    --text: #f5f5f7;
+    --text-2: #a1a1a8;
+    --text-3: #6e6e76;
+    --grounded: #3fb950;
+    --refused: #d29922;
+    --blocked: #f85149;
+    --accent: #4c8dff;
+    --sans: ui-sans-serif, -apple-system, "SF Pro Text", "Inter", system-ui, sans-serif;
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", "Menlo", monospace;
+    --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px;
+    --s5: 24px; --s6: 32px; --s7: 48px; --s8: 64px; --s9: 96px;
+    --radius: 10px;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+  code, .mono { font-family: var(--mono); }
+
+  h1, h2, h3, h4 { margin: 0; font-weight: 600; letter-spacing: -0.02em; text-wrap: balance; }
+  h1 { font-size: clamp(2rem, 4.5vw, 3rem); letter-spacing: -0.03em; line-height: 1.05; }
+  h2 { font-size: clamp(1.375rem, 2.5vw, 1.75rem); }
+  h3 { font-size: 1.125rem; font-weight: 590; }
+  p { margin: 0; max-width: 68ch; }
+  p + p { margin-top: var(--s4); }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: var(--s8);
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: var(--s7) var(--s5) var(--s9);
+  }
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; gap: var(--s5); padding: var(--s5); }
+    .toc { position: static !important; }
+  }
+
+  .toc {
+    position: sticky;
+    top: var(--s6);
+    align-self: start;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s2);
+    font-size: 0.8125rem;
+    max-height: calc(100vh - var(--s6) * 2);
+    overflow-y: auto;
+  }
+  .toc a {
+    color: var(--text-3);
+    padding: var(--s1) 0;
+    border-left: 2px solid transparent;
+    padding-left: var(--s3);
+  }
+  .toc a:hover { color: var(--text); text-decoration: none; border-color: var(--line); }
+  .toc-label {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.6875rem;
+    color: var(--text-3);
+    margin-bottom: var(--s2);
+  }
+
+  main { min-width: 0; }
+
+  header.hero { margin-bottom: var(--s9); }
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    color: var(--text-3);
+    text-transform: uppercase;
+    margin-bottom: var(--s4);
+    display: block;
+  }
+  .lede {
+    color: var(--text-2);
+    font-size: 1.1875rem;
+    margin-top: var(--s5);
+    max-width: 62ch;
+  }
+  .metarow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s3) var(--s6);
+    margin-top: var(--s7);
+    padding-top: var(--s5);
+    border-top: 1px solid var(--line);
+  }
+  .metaitem dt { font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-3); }
+  .metaitem dd { margin: var(--s1) 0 0; font-family: var(--mono); font-size: 0.9375rem; }
+
+  section { margin-bottom: var(--s9); scroll-margin-top: var(--s6); }
+  section > h2 {
+    display: flex; align-items: baseline; gap: var(--s3);
+    margin-bottom: var(--s6);
+    padding-bottom: var(--s4);
+    border-bottom: 1px solid var(--line);
+  }
+  section > h2 .num { font-family: var(--mono); color: var(--text-3); font-size: 0.9375rem; font-weight: 400; }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: var(--s6);
+  }
+  .panel + .panel { margin-top: var(--s5); }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s5); }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s5); }
+  @media (max-width: 700px) { .grid2, .grid3 { grid-template-columns: 1fr; } }
+
+  .stat dt { color: var(--text-3); font-size: 0.8125rem; }
+  .stat dd { margin: var(--s1) 0 0; font-family: var(--mono); font-size: 1.5rem; }
+  .stat dd small { font-size: 0.875rem; color: var(--text-3); font-weight: 400; }
+
+  .chip {
+    display: inline-flex; align-items: center; gap: var(--s2);
+    padding: 3px var(--s3);
+    border: 1px solid var(--line); border-radius: 999px;
+    font-size: 0.75rem; font-weight: 500; white-space: nowrap;
+  }
+  .chip::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .chip--grounded { color: var(--grounded); border-color: color-mix(in srgb, var(--grounded) 35%, var(--line)); }
+  .chip--refused  { color: var(--refused);  border-color: color-mix(in srgb, var(--refused) 35%, var(--line)); }
+  .chip--blocked  { color: var(--blocked);  border-color: color-mix(in srgb, var(--blocked) 35%, var(--line)); }
+  .chip--neutral  { color: var(--text-2); }
+
+  .tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.9375rem; min-width: 560px; }
+  th, td { text-align: left; padding: var(--s3) var(--s4); vertical-align: top; }
+  thead th { color: var(--text-3); font-weight: 500; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid var(--line); }
+  tbody tr + tr td { border-top: 1px solid var(--line); }
+  tbody tr:hover { background: var(--surface); }
+  td.mono, th.mono { font-variant-numeric: tabular-nums; }
+
+  .quote {
+    border-left: 2px solid var(--accent);
+    padding-left: var(--s5);
+    color: var(--text-2);
+    font-size: 1.0625rem;
+    font-style: normal;
+  }
+  .quote cite { display: block; margin-top: var(--s3); font-size: 0.8125rem; color: var(--text-3); font-style: normal; }
+
+  .role-voice { padding: var(--s4) 0; border-top: 1px solid var(--line); }
+  .role-voice:first-of-type { border-top: none; padding-top: 0; }
+  .role-voice .who { font-weight: 590; margin-right: var(--s2); }
+
+  .lens-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--s3); }
+  @media (max-width: 900px) { .lens-grid { grid-template-columns: repeat(2, 1fr); } }
+  .lens {
+    background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: var(--s4); font-size: 0.8125rem;
+  }
+  .lens .n { font-family: var(--mono); color: var(--accent); font-size: 0.75rem; }
+  .lens h4 { font-size: 0.9375rem; margin: var(--s2) 0 var(--s2); }
+  .lens p { color: var(--text-2); font-size: 0.8125rem; }
+
+  pre.mermaid { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: var(--s5); overflow-x: auto; }
+
+  .callout {
+    border: 1px solid color-mix(in srgb, var(--refused) 35%, var(--line));
+    background: color-mix(in srgb, var(--refused) 6%, var(--surface));
+    border-radius: var(--radius);
+    padding: var(--s5);
+  }
+  .callout--blocked {
+    border-color: color-mix(in srgb, var(--blocked) 35%, var(--line));
+    background: color-mix(in srgb, var(--blocked) 6%, var(--surface));
+  }
+  .callout p { max-width: none; }
+
+  ul.plain { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s3); }
+  hr.hairline { border: 0; border-top: 1px solid var(--line); margin: var(--s6) 0; }
+
+  footer {
+    margin-top: var(--s9);
+    padding-top: var(--s6);
+    border-top: 1px solid var(--line);
+    color: var(--text-3);
+    font-size: 0.8125rem;
+  }
+</style>
+
+<div class="layout">
+  <nav class="toc" aria-label="Table of contents">
+    <span class="toc-label">Record</span>
+    <a href="#status">0 · Status</a>
+    <a href="#brief">1 · Founding brief</a>
+    <a href="#brd">2 · Business case</a>
+    <a href="#prd">3 · Product</a>
+    <a href="#lifecycle">4 · Lifecycle model</a>
+    <a href="#roles">5 · Roles &amp; charter</a>
+    <a href="#timeline">6 · Timeline</a>
+    <a href="#flow">7 · How work moved</a>
+    <a href="#budget">8 · Budget</a>
+    <a href="#council">9 · Council retrospective</a>
+    <a href="#open">10 · What's still open</a>
+  </nav>
+
+  <main>
+    <header class="hero">
+      <span class="eyebrow">Project Record · SandScope</span>
+      <h1>Everything that happened, in order, cited.</h1>
+      <p class="lede">
+        A record of one build, from a founding brief to the current commit — the requirements,
+        the roles, the sprints, the defects, and where each disagreement inside the process
+        actually came from. Every number below is read from this repository, not recalled.
+      </p>
+      <dl class="metarow">
+        <div class="metaitem"><dt>Repository</dt><dd>224Sand/sandscope</dd></div>
+        <div class="metaitem"><dt>Span</dt><dd>2026-08-20 → 2026-08-22</dd></div>
+        <div class="metaitem"><dt>Sprints</dt><dd>9 planned (0–8) · 8 closed</dd></div>
+        <div class="metaitem"><dt>Requirements</dt><dd>58 total · 13 done</dd></div>
+        <div class="metaitem"><dt>Defects logged</dt><dd>18 · 6 severity-1</dd></div>
+        <div class="metaitem"><dt>Budget</dt><dd>$0 infra, tested</dd></div>
+      </dl>
+    </header>
+
+    <section id="status">
+      <h2><span class="num">0</span> Status, plainly</h2>
+      <div class="callout callout--blocked">
+        <p>
+          <strong>This is not finished.</strong> 45 of 58 requirements are still <span class="mono">Planned</span>.
+          The agent runtime is live and verified end to end on a public host. <strong>The web
+          application is not deployed</strong> — no public URL exists for it yet. Read the rest
+          of this document as an honest record of a build in progress, not a completion claim.
+        </p>
+      </div>
+      <div class="grid3" style="margin-top: var(--s5);">
+        <div class="panel stat"><dt>Agent runtime</dt><dd><span class="chip chip--grounded" style="margin-bottom:6px">live</span><br>Northflank, London</dd></div>
+        <div class="panel stat"><dt>Web application</dt><dd><span class="chip chip--blocked" style="margin-bottom:6px">not deployed</span><br>no public URL</dd></div>
+        <div class="panel stat"><dt>CI / Security</dt><dd><span class="chip chip--grounded" style="margin-bottom:6px">green</span><br>7 security jobs, 3 CI jobs</dd></div>
+      </div>
+    </section>
+
+    <section id="brief">
+      <h2><span class="num">1</span> Founding brief</h2>
+      <p>
+        SandScope began from a single instruction: build a demonstration of Forward-Deployed
+        Engineering and AI Solutions Architecture capability, run to a real production standard,
+        with a $0 infrastructure ceiling and no wasted motion — stated in the founding brief as
+        <em>"unnecessary spend on tokens, unnecessary brainstorming is a sin in this project."</em>
+        Not a portfolio listing built projects. A new system, simulated end to end, judged on
+        whether the engineering underneath it would survive contact with a real reviewer.
+      </p>
+      <div class="quote" style="margin-top: var(--s5);">
+        The control plane for AI agents that operate production systems.
+        <cite>— PRD.md §1, Vision</cite>
+      </div>
+    </section>
+
+    <section id="brd">
+      <h2><span class="num">2</span> Business case</h2>
+      <p>
+        The business case is unusual in naming its own fiction upfront. SandScope's customers —
+        the platform and SRE teams it's positioned for — are simulated. The engineering underneath
+        them is not.
+      </p>
+      <div class="panel" style="margin-top: var(--s5);">
+        <p>
+          <em>"SandScope is a demonstration product built to production standards on synthetic
+          data. The engineering is real: the services, the failover, the retrieval, the
+          evaluation, the tests, the pipeline and the deployment all function. The customers are
+          simulated. This is stated plainly at the top of the document, and it is stated on the
+          live site, because the alternative is a reader discovering it themselves and
+          discounting everything else."</em>
+        </p>
+        <p style="margin-top: var(--s3); color: var(--text-3); font-size: 0.875rem;">— BRD.md §0, Nature of this document</p>
+      </div>
+    </section>
+
+    <section id="prd">
+      <h2><span class="num">3</span> Product</h2>
+      <p>
+        Demonstrated through one flagship workload — <strong>production incident triage</strong> —
+        because that is where an agent's accountability is tested hardest: it must decide, per
+        question, whether it has enough grounded evidence to answer at all.
+      </p>
+      <div class="tablewrap" style="margin-top: var(--s5);">
+        <table>
+          <thead><tr><th>Band</th><th>Behaviour</th></tr></thead>
+          <tbody>
+            <tr><td><span class="chip chip--grounded">SUFFICIENT</span></td><td>answer, every claim cited</td></tr>
+            <tr><td><span class="chip chip--refused">AMBIGUOUS</span></td><td>answer, flagged partial — never silently upgraded</td></tr>
+            <tr><td><span class="chip chip--blocked">INSUFFICIENT</span></td><td>refuse — no draft is emitted at all</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin-top: var(--s5); color: var(--text-3); font-size: 0.875rem;">
+        Full requirements: <code>docs/01-requirements/PRD.md</code> and <code>BRD.md</code>.
+      </p>
+    </section>
+
+    <section id="lifecycle">
+      <h2><span class="num">4</span> Lifecycle model — five lenses</h2>
+      <p>
+        Every sprint is read through five lenses at once, because none of them alone explains
+        what a piece of work actually is. A task can be MVP-stage product, Implementation-phase
+        SDLC, Development-stage PDLC, AIDLC-7 Serving, and Sprint 2, simultaneously — and the
+        label is meant to be legible on its own, without opening the sprint plan.
+      </p>
+      <div class="lens-grid" style="margin-top: var(--s5);">
+        <div class="lens"><span class="n">01</span><h4>Product stage</h4><p>Concept → MVP → GA. Where the product itself sits.</p></div>
+        <div class="lens"><span class="n">02</span><h4>SDLC phase</h4><p>Requirements → Design → Implementation → Test → Release. The engineering process.</p></div>
+        <div class="lens"><span class="n">03</span><h4>PDLC stage</h4><p>Discovery → Definition → Development → Delivery. The product-management process.</p></div>
+        <div class="lens"><span class="n">04</span><h4>AIDLC (1–8)</h4><p>Feasibility → data → context → grounding → evaluation → governance → serving → observability. Mapped to NIST AI RMF.</p></div>
+        <div class="lens"><span class="n">05</span><h4>Agile cadence</h4><p>Sprint number, backlog, velocity, retro. The rhythm all four other lenses move inside.</p></div>
+      </div>
+
+      <h3 style="margin-top: var(--s7); margin-bottom: var(--s4);">The AIDLC stages, in order</h3>
+      <pre class="mermaid">
+flowchart LR
+    A1["AIDLC-1<br/>Use-case framing<br/><span style='font-size:11px'>Is this an AI problem?</span>"] --> A2["AIDLC-2<br/>Data curation<br/><span style='font-size:11px'>What does it NOT know?</span>"]
+    A2 --> A3["AIDLC-3<br/>Context engineering<br/><span style='font-size:11px'>Task &amp; tool contracts</span>"]
+    A3 --> A4["AIDLC-4<br/>Retrieval &amp; grounding<br/><span style='font-size:11px'>Evidence → claim</span>"]
+    A4 --> A5["AIDLC-5<br/>Evaluation design<br/><span style='font-size:11px'>Golden set, regressions</span>"]
+    A5 --> A6["AIDLC-6<br/>Guardrails<br/><span style='font-size:11px'>Refusal, approval, spend</span>"]
+    A6 --> A7["AIDLC-7<br/>Deployment &amp; serving<br/><span style='font-size:11px'>Routing, caching, failover</span>"]
+    A7 --> A8["AIDLC-8<br/>Observability<br/><span style='font-size:11px'>Can any decision be traced back?</span>"]
+    style A1 fill:#0b0b0d,stroke:#26262b,color:#f5f5f7
+    style A2 fill:#0b0b0d,stroke:#4c8dff,color:#f5f5f7
+    style A3 fill:#0b0b0d,stroke:#26262b,color:#f5f5f7
+    style A4 fill:#0b0b0d,stroke:#26262b,color:#f5f5f7
+    style A5 fill:#0b0b0d,stroke:#26262b,color:#f5f5f7
+    style A6 fill:#0b0b0d,stroke:#26262b,color:#f5f5f7
+    style A7 fill:#0b0b0d,stroke:#26262b,color:#f5f5f7
+    style A8 fill:#0b0b0d,stroke:#26262b,color:#f5f5f7
+      </pre>
+      <p style="margin-top: var(--s3); color: var(--text-3); font-size: 0.8125rem;">
+        AIDLC-2 (data curation) carries deliberate weight in this project: the fact ledger and
+        corpus scoping decisions there are what everything downstream — retrieval, evaluation,
+        the refusal gate — depends on being honest about. Full mapping to NIST AI RMF's
+        MAP/MEASURE/MANAGE functions: <code>docs/00-governance/LIFECYCLE_MODEL.md</code>.
+      </p>
+    </section>
+
+    <section id="roles">
+      <h2><span class="num">5</span> Roles &amp; charter</h2>
+      <p>
+        Eleven delivery roles, four stakeholder roles, one rule that holds the whole thing
+        together: <strong>a role may not sign off its own work.</strong> QA Lead signs off DEV.
+        The Architect signs off DEV on design conformance. The Product Owner signs off anything
+        that changes scope.
+      </p>
+      <div class="tablewrap" style="margin-top: var(--s5);">
+        <table>
+          <thead><tr><th>Role</th><th>Owns</th><th>Produces</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Business Analyst</strong></td><td>Requirements elicitation, acceptance criteria</td><td>BRD, user stories, traceability matrix</td></tr>
+            <tr><td><strong>Product Manager</strong></td><td>Vision, scope, prioritisation</td><td>PRD, roadmap, release notes</td></tr>
+            <tr><td><strong>Technical Program Manager</strong></td><td>Charter, sprint plan, risks, dependencies</td><td>Sprint plans, risk register, status</td></tr>
+            <tr><td><strong>Scrum Master</strong></td><td>Ceremonies, impediment removal, velocity</td><td>Sprint reviews, retrospectives</td></tr>
+            <tr><td><strong>Solutions Architect / FDE</strong></td><td>System design, deployment topology</td><td>Tech spec, ADRs, architecture diagrams</td></tr>
+            <tr><td><strong>UX / UI Designer</strong></td><td>Design system, layout, motion, accessibility</td><td>Design tokens, wireframes</td></tr>
+            <tr><td><strong>Software Engineer</strong></td><td>Implementation</td><td>Source code</td></tr>
+            <tr><td><strong>SDET</strong></td><td>Automated test suites</td><td>Unit, integration, contract, e2e tests</td></tr>
+            <tr><td><strong>QA Lead</strong></td><td>Test strategy, Definition of Done, defect triage</td><td>Test plan, defect log</td></tr>
+            <tr><td><strong>DevOps / SRE</strong></td><td>CI/CD, environments, incident response</td><td>Pipelines, Dockerfile, runbooks</td></tr>
+            <tr><td><strong>AppSec Engineer</strong></td><td>Threat model, SAST/DAST, supply chain, pen testing</td><td>Threat model, security pipelines, SBOM</td></tr>
+            <tr><td><strong>Technical Writer</strong></td><td>User-facing and internal documentation</td><td>READMEs, API docs</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin-top: var(--s5); color: var(--text-3); font-size: 0.875rem;">
+        Plus four stakeholder roles held by the person commissioning the work: Executive Sponsor
+        (absolute authority — budget, go/no-go), Product Owner (backlog, accept/reject stories),
+        Stakeholder/SME (domain facts, advisory), and Release Authority (deployment is blocked
+        without it). Full charter: <code>docs/00-governance/WAYS_OF_WORKING.md</code>.
+      </p>
+    </section>
+
+    <section id="timeline">
+      <h2><span class="num">6</span> Timeline</h2>
+      <p>Sprint boundaries, read from the commits that opened and closed each one — not from a plan drafted afterward.</p>
+      <div class="tablewrap" style="margin-top: var(--s5);">
+        <table>
+          <thead><tr><th>Sprint</th><th>Name</th><th>Opened</th><th>Closed</th><th>Gate</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">0</td><td>Inception</td><td class="mono">08-20 04:21</td><td class="mono">08-20 04:30</td><td><span class="chip chip--grounded">Requirements Sign-off</span></td></tr>
+            <tr><td class="mono">1</td><td>Foundation</td><td class="mono">08-20 04:38</td><td class="mono">08-20 04:54</td><td><span class="chip chip--grounded">Sprint Review</span></td></tr>
+            <tr><td class="mono">2</td><td>Agent Core I</td><td class="mono">08-20 04:54</td><td class="mono">08-20 05:49</td><td><span class="chip chip--grounded">Sprint Review</span></td></tr>
+            <tr><td class="mono">3</td><td>Applied ML &amp; Evaluation</td><td class="mono">08-20 05:49</td><td class="mono">08-20 20:56</td><td><span class="chip chip--grounded">Sprint Review</span></td></tr>
+            <tr><td class="mono">4</td><td>Agent Core II</td><td class="mono">08-20 21:13</td><td class="mono">08-20 21:35</td><td><span class="chip chip--grounded">Sprint Review</span></td></tr>
+            <tr><td class="mono">5</td><td>Console</td><td class="mono">08-20 22:27</td><td class="mono">08-21 10:17</td><td><span class="chip chip--grounded">UAT</span></td></tr>
+            <tr><td class="mono">6</td><td>Experience</td><td class="mono">08-21 23:09 <span class="chip chip--refused" style="font-size:0.6875rem">backfilled</span></td><td class="mono">08-21 23:09</td><td><span class="chip chip--grounded">Design + UAT</span></td></tr>
+            <tr><td class="mono">7</td><td>Proof Surfaces</td><td class="mono">08-21 23:09 <span class="chip chip--refused" style="font-size:0.6875rem">backfilled</span></td><td class="mono">08-21 23:09</td><td><span class="chip chip--grounded">UAT</span></td></tr>
+            <tr><td class="mono">8</td><td>Hardening &amp; Release</td><td class="mono">08-21 23:09</td><td class="mono">— open —</td><td><span class="chip chip--blocked">Release Approval</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin-top: var(--s4); color: var(--text-3); font-size: 0.8125rem;">
+        Sprints 6 and 7 were worked and shipped with no planning ceremony, then written up
+        retroactively — labelled as backfilled rather than dated to look otherwise. That gap is
+        its own entry in the record: <a href="#council">§9, artifact 5</a>.
+        Timestamps are IST, read from <code>git log</code>.
+      </p>
+    </section>
+
+    <section id="flow">
+      <h2><span class="num">7</span> How work moved</h2>
+      <p>
+        Every input is classified by role on receipt. A decision doesn't ship on a role's own
+        say-so — it needs a role that didn't produce it to sign off.
+      </p>
+      <pre class="mermaid">
+flowchart LR
+    In["Input received"] --> Classify["Classify by role<br/>BA / PM / TPM / Stakeholder"]
+    Classify --> Log["Logged →<br/>requirement ID"]
+    Log --> Build["Role does the work<br/>named before starting"]
+    Build --> SelfCheck{"Self sign-off?"}
+    SelfCheck -- "not allowed" --> Independent["Independent role reviews<br/>QA signs off DEV · Architect signs off design"]
+    Independent --> Gate{"Passes?"}
+    Gate -- no --> Build
+    Gate -- yes --> Ship["Ships · sprint review<br/>records it"]
+    style In fill:#0b0b0d,stroke:#26262b,color:#f5f5f7
+    style Classify fill:#0b0b0d,stroke:#26262b,color:#f5f5f7
+    style Log fill:#0b0b0d,stroke:#26262b,color:#f5f5f7
+    style Build fill:#0b0b0d,stroke:#26262b,color:#f5f5f7
+    style SelfCheck fill:#141417,stroke:#d29922,color:#f5f5f7
+    style Independent fill:#0b0b0d,stroke:#4c8dff,color:#f5f5f7
+    style Gate fill:#141417,stroke:#d29922,color:#f5f5f7
+    style Ship fill:#0b0b0d,stroke:#3fb950,color:#f5f5f7
+      </pre>
+      <p style="margin-top: var(--s4); color: var(--text-3); font-size: 0.8125rem;">
+        This is the process as charted at Sprint 0. §9 records where it held and where it didn't
+        — most notably Sprints 6–7, where it ran without the "logged → sprint plan" step, and was
+        only caught because a Sprint 5 retrospective commitment named it as a risk in advance.
+      </p>
+    </section>
+
+    <section id="budget">
+      <h2><span class="num">8</span> Budget</h2>
+      <p>
+        The honest figure, not a rounded one: <strong>$0 of infrastructure spend</strong>, and
+        no team beyond one person plus an AI agent operating under named roles. There is no
+        headcount to report and no dollar figure to invent, so none is given here.
+      </p>
+      <div class="grid2" style="margin-top: var(--s5);">
+        <div class="panel">
+          <h3>What "$0" means here</h3>
+          <p style="margin-top: var(--s3);">
+            Every hosted dependency — Neon, Upstash, Northflank, Vercel, the LLM providers —
+            runs on a free tier. This is a tested requirement, not a claim:
+            <code>test_no_paid_service_in_deploy_manifest</code> fails the build if a paid host
+            appears in a deployment manifest.
+          </p>
+        </div>
+        <div class="panel">
+          <h3>Where it already failed once</h3>
+          <p style="margin-top: var(--s3);">
+            ADR-0003 placed the agent runtime on a host that later moved behind a paid plan.
+            The $0 constraint held — the runtime was moved rather than the constraint being
+            quietly dropped — but it held only after the gap was found. Recorded as D-017,
+            reviewed in §9.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="council">
+      <h2><span class="num">9</span> Council retrospective</h2>
+      <p>
+        Built as <a href="https://github.com/224Sand/sandscope/tree/main/skills/role-council"><code>skills/role-council</code></a>
+        — a reusable, git-portable skill that runs a cross-functional review over any repo's real
+        history, then run against this project's own. Every reaction below cites a real defect,
+        ADR, or file; none is an invented opinion. Two of nine reviewed artifacts, in full —
+        the rest are in <code>docs/00-governance/COUNCIL_RETROSPECTIVE.md</code>.
+      </p>
+
+      <div class="panel" style="margin-top: var(--s6);">
+        <span class="chip chip--blocked" style="margin-bottom: var(--s3);">D-001 · severity 1</span>
+        <h3>The Sprint 2 gate reported 0% false-answer rate. The real rate was 56.6%.</h3>
+        <p style="margin-top: var(--s3); color: var(--text-2);">
+          The refusal gate marked 150 of 265 unanswerable questions as answerable, on a sample
+          where the Sprint 2 gate had reported zero errors.
+        </p>
+        <div style="margin-top: var(--s5);">
+          <div class="role-voice"><span class="who">QA Lead</span> The test set was written by the implementer, on 22 questions, and every one happened to be easy. The same person who builds a gate shouldn't be the only one deciding what counts as a hard question for it.</div>
+          <div class="role-voice"><span class="who">Business Analyst</span> A 0% error rate at a sprint gate should have triggered a question before it was accepted, not after a defect was found. If the acceptance criteria didn't require a minimum sample size, that's a gap in what I wrote at Sprint 0.</div>
+          <div class="role-voice"><span class="who">Technical Program Manager</span> This changes how I'd read every other green metric in the project. If a headline number can be 0% wrong on a small sample and 57% wrong on a large one, "passed at the gate" needs a stated sample size next to it from now on.</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <span class="chip chip--refused" style="margin-bottom: var(--s3);">D-016 · severity 2</span>
+        <h3>Sprints 6 and 7 were worked and shipped without ever being opened.</h3>
+        <p style="margin-top: var(--s3); color: var(--text-2);">
+          No planning ceremony, no plan document — a Sprint 5 retrospective had already committed
+          to raising exactly this as an impediment if it happened. It happened anyway.
+        </p>
+        <div style="margin-top: var(--s5);">
+          <div class="role-voice"><span class="who">Scrum Master</span> The team wrote down the exact failure mode in advance and didn't catch it when it occurred. A committed retrospective action that isn't checked at the next retro isn't an action, it's a wish.</div>
+          <div class="role-voice"><span class="who">Executive Sponsor</span> The part I actually want to know: was the work good despite the missing ceremony? Reading the backfilled reviews, yes. This is a paperwork failure, not a delivery failure — which matters for how seriously to take it, though it's still worth fixing.</div>
+        </div>
+      </div>
+
+      <p style="margin-top: var(--s5); color: var(--text-3); font-size: 0.875rem;">
+        Full retrospective — all nine artifacts, plus a synthesis on which roles converge versus
+        genuinely diverge — in <code>docs/00-governance/COUNCIL_RETROSPECTIVE.md</code>.
+      </p>
+    </section>
+
+    <section id="open">
+      <h2><span class="num">10</span> What's still open</h2>
+      <ul class="plain">
+        <li class="panel"><strong>The web application is not deployed.</strong> No Vercel project exists. This is the single blocking item — nothing else in this record substitutes for a public URL.</li>
+        <li class="panel"><strong>45 of 58 requirements are Planned</strong>, not Done. <code>docs/01-requirements/TRACEABILITY.md</code> names each one and the test it's waiting on.</li>
+        <li class="panel"><strong>Sprint 8 (Hardening &amp; Release) is open</strong> — 21 of 34 committed points are blocked on deployment credentials, per <code>SPRINT_08_PLAN.md</code> IMP-09.</li>
+      </ul>
+    </section>
+
+    <footer>
+      Every figure above is read from the repository at the commit this record was written
+      against. Where a number here and the repository disagree, the repository is correct —
+      this document does not regenerate itself the way <code>/delivery</code> does.
+    </footer>
+  </main>
+</div>
+
+<script>
+  document.querySelectorAll('.toc a').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      document.querySelector(a.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+</script>
