@@ -115,12 +115,40 @@ function sprints() {
 }
 
 const commits = git("rev-list", "--count", "HEAD");
+const lastCommit = git("log", "-1", "--format=%aI");
+
 // `git log --reverse --max-count=1` does NOT give the first commit: the limit
 // is applied before the reversal, so it returns the newest commit and reverses
 // a list of one. It reported firstCommit === lastCommit, which made the project
 // look like it happened in a single instant. Ask for the root commit instead.
-const firstCommit = git("log", "-1", "--format=%aI", git("rev-list", "--max-parents=0", "HEAD").split("\n")[0]);
-const lastCommit = git("log", "-1", "--format=%aI");
+//
+// A build host may hand this script a SHALLOW clone -- CI's default checkout
+// was depth-1 until that was fixed here, and a hosting platform's git
+// checkout is not guaranteed full history either. `--max-parents=0` does NOT
+// throw on a shallow clone to signal that: git treats the shallow boundary
+// commit as parentless from the local repo's point of view and hands it back
+// with exit 0, so a try/catch around it never engages. Verified against a
+// REAL shallow clone (`git clone --depth 1`), not assumed -- it returned the
+// current HEAD as "the root commit", exactly the firstCommit===lastCommit
+// bug this block exists to fix, reached by a path that looks like success.
+// The only reliable signal is asking git directly whether the clone is
+// shallow, so that is checked explicitly rather than inferred.
+let firstCommit;
+const isShallow = git("rev-parse", "--is-shallow-repository") === "true";
+if (isShallow) {
+  console.warn(
+    "derive-delivery: shallow clone -- the true first commit is not in this " +
+      "checkout. Using the oldest commit available instead (may equal the " +
+      "latest commit, and the `commits` total below is a lower bound too).",
+  );
+  // `-1 --reverse` has the exact limit-before-reverse bug documented above.
+  // List everything this checkout has, oldest last, and take that.
+  const all = git("log", "--format=%aI").split("\n").filter(Boolean);
+  firstCommit = all[all.length - 1];
+} else {
+  const root = git("rev-list", "--max-parents=0", "HEAD").split("\n")[0];
+  firstCommit = git("log", "-1", "--format=%aI", root);
+}
 const sha = git("rev-parse", "--short", "HEAD");
 
 const record = {
